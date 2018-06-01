@@ -1,2 +1,7 @@
 # CNN_LeNet
-C++ code of CNN LeNet rewrited from existed matlab code.
+
+## 内容：
+这是根据已有的LeCun的LeNet的matlab代码，改写成为了可工程化的C++代码。
+
+## 目的：
+在熟悉深度学习理论的基础上，进一步通过代码来深入了解深度学习的所有细节，以便彻底掌握深度学习的框架和细节。
