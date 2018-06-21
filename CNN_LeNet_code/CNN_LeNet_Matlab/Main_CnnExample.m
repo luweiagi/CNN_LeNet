@@ -22,9 +22,14 @@ clear all; close all; clc;
 
 %--------------------------------------------------------------------------
 
-load('TrainTestSample.mat','SAMPLE','TARBP','TARSVM');
+%load('TrainTestSample.mat','SAMPLE','TARBP','TARSVM');
+% SAMPLE是1000张32x32的图片
+% TARBP是1000个图片对应的10维BP目标矢量
+% TARSVM是1000张图片SVM处理的结果
 train_x = normalize_lzb(double(SAMPLE));                            % 输入图片归一化到[0 1], double型
+% train_x = 32x32x1000
 train_y = double(TARBP);
+% train_y = 10x1000
 
 test_x = train_x;
 test_y = train_y;
@@ -33,9 +38,10 @@ test_y = train_y;
 
 rng(1);
 kk = randperm(size(train_x,3));                                                   % 打乱训练样本顺序
+% kk是1000张图像打乱顺序后的排列
 
 figure;
-for I=1:25
+for I=1:25% 抽取打乱顺序后的前25张图片
     i = kk(I);
     Y1 = train_x(:,:,i)*255;                                      % 特别注意: 原图为仅有0,255的二值化图像
     Y2 = Y1;                                                     % 原始数据按C语言行方向存储,这里显示需要转置
