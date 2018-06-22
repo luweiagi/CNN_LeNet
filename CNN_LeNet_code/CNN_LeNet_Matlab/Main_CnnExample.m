@@ -22,7 +22,7 @@ clear all; close all; clc;
 
 %--------------------------------------------------------------------------
 
-%load('TrainTestSample.mat','SAMPLE','TARBP','TARSVM');
+load('TrainTestSample.mat','SAMPLE','TARBP','TARSVM');
 % SAMPLE是1000张32x32的图片
 % TARBP是1000个图片对应的10维BP目标矢量
 % TARSVM是1000张图片SVM处理的结果
