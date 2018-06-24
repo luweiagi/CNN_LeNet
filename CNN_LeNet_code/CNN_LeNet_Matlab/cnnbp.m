@@ -4,6 +4,7 @@ function net = cnnbp(net, y)
 n = numel(net.layers);                                              % CNN网络层数
 
 E = net.layers{n}.X - y;                                            % 输出误差: 预测值-期望值
+
 net.layers{n}.Delta = E .* dy(net.layers{n}.X);                     % 输出层灵敏度(残差)
 
 net.err = 1/2* sum(E(:) .^ 2) / size(E, 2);                         % 代价函数是均方误差,已对样本数做平均
@@ -34,7 +35,7 @@ for L = (n - 1) : -1 : tmp
         
         elseif (strcmp(net.layers{L}.type, 's') || strcmp(net.layers{L}.type, 'c') || strcmp(net.layers{L}.type, 'i'))
         %------------------------------------------------------------------
-        % 以下代码对第6层(过渡全连接层)有效            
+        % 以下代码对第6层(过渡全连接层)有效     这里是不是写错了？应该是第四层啊       
 
             sa = size(net.layers{L}.X{1});                          % 每个输出通道图像尺寸(三维矢量,前两维是尺寸,第三维是批处理样本个数)
             fvnum = sa(1) * sa(2);                                  % 输出图像像素个数
