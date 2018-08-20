@@ -7,4 +7,4 @@
 
 using namespace cv;
 
-void set_target_class_one2ten(uchar target_class[][1000], int length);
+void set_target_class_one2ten(unsigned char target_class[][1000]);

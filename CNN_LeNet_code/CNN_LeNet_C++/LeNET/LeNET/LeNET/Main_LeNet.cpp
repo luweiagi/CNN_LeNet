@@ -31,9 +31,9 @@ int main()
 	// load ¼ÓÔØÍ¼Æ¬
 	Mat train_x = imread("file/lena.jpg");
 	uchar train_y[10][1000] = { 0 };
-	set_target_class_one2ten(train_y, 1000);
-	print_matrix2x2((unsigned char**)train_y, 10, 1000);
-	show_mat2x2_as_image((uchar**)train_y, 10, 1000, 6000);
+	set_target_class_one2ten(train_y);
+	print_matrix((unsigned char*)train_y, 10, 1000);
+	show_matrix_as_image((uchar*)train_y, 10, 1000, 6000);
 
 
 	// ÏÔÊ¾Í¼Æ¬   
@@ -55,15 +55,15 @@ int main()
 }
 
 
-void set_target_class_one2ten(uchar target_class[][1000], int length)
+void set_target_class_one2ten(unsigned char target_class[][1000])
 {
 	int i, j;
-	int segment_size = 1000 / length;
-	for (i = 0; i < 9; i++)
+	int segment_size = 1000 / 10;
+	for (i = 0; i <= 9; i++)
 	{
 		for (j = i * segment_size; j < (i + 1) * segment_size; j++)
 		{
-			target_class[i][j] = 1;
+			target_class[i][j] = 255;
 		}
 	}
 }

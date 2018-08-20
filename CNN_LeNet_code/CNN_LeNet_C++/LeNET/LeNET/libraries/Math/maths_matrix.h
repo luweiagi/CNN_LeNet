@@ -1,3 +1,15 @@
 #pragma once
 
-void print_matrix2x2(unsigned char **array, int row, int col);
+template <typename T>
+void print_matrix(T *array, int row, int col)
+{
+	for (int i = 0; i < row; i++)
+	{
+		for (int j = 0; j < col; j++)
+		{
+			cout << (int)*(array + i * col * sizeof(T) + j) << ' ';
+		}
+		cout << endl;
+	}
+}
+

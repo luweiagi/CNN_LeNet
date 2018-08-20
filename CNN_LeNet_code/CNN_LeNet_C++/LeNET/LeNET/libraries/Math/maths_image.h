@@ -6,6 +6,6 @@
 
 using namespace cv;
 
-Mat mat2x2_to_Mat(uchar **array, int row, int col);
+Mat matrix_to_Mat(uchar *array, int row, int col);
 
-void show_mat2x2_as_image(uchar **array, int row, int col, int time_msec);
+void show_matrix_as_image(uchar *array, int row, int col, int time_msec);
