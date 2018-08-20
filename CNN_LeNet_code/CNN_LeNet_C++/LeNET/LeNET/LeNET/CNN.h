@@ -10,11 +10,12 @@ template <typename T>
 class CNN
 {
 public:
-	/*CNN(float alpha, float eta, int batchsize, int epochs)
+
+	CNN(float alpha, float eta, int batchsize, int epochs)
 		:alpha(alpha), eta(eta), batchsize(batchsize), epochs(epochs)
 	{
 
-	}*/
+	}
 	
 	//train();
 

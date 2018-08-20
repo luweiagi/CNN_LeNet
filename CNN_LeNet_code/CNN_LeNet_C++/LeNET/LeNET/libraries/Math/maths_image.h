@@ -4,8 +4,14 @@
 #include <opencv2/imgproc/imgproc.hpp>  
 #include <opencv2/core/core.hpp>  
 
-using namespace cv;
+// 不能出现：using namespace cv;
+using namespace std;
 
-Mat matrix_to_Mat(uchar *array, int row, int col);
+cv::Mat matrix_double_to_Mat_64FC1(double *array, int row, int col);
 
-void show_matrix_as_image(uchar *array, int row, int col, int time_msec);
+void show_matrix_double_as_image_64FC1(double *array, int row, int col, int time_msec);
+
+void multi_image_64FC1_putin_one_window(const std::string& MultiShow_WinName, const vector<cv::Mat>& SrcImg_V, CvSize SubPlot, CvSize ImgMax_Size, int time_msec);
+
+void multi_image_8UC3_putin_one_window(const std::string& MultiShow_WinName, const vector<cv::Mat>& SrcImg_V, CvSize SubPlot, CvSize ImgMax_Size, int time_msec);
+

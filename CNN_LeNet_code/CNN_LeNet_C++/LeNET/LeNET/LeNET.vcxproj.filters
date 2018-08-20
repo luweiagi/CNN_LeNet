@@ -30,6 +30,9 @@
     <ClCompile Include="libraries\Math\maths_matrix.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="libraries\Math\maths_image_windows.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="libraries\Math\maths.h">
