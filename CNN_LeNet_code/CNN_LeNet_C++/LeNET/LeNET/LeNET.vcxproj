@@ -152,6 +152,7 @@
     <ClCompile Include="libraries\Math\maths_image.cpp" />
     <ClCompile Include="libraries\Math\maths_image_windows.cpp" />
     <ClCompile Include="libraries\Math\maths_matrix.cpp" />
+    <ClCompile Include="libraries\Math\maths_vector.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="LeNET\CNN.h" />
@@ -159,6 +160,7 @@
     <ClInclude Include="libraries\Math\maths.h" />
     <ClInclude Include="libraries\Math\maths_image.h" />
     <ClInclude Include="libraries\Math\maths_matrix.h" />
+    <ClInclude Include="libraries\Math\maths_vector.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -1,12 +1,11 @@
 #include <iostream>
 #include <maths_image.h>
 #include <windows.h>
-
 using namespace std;
 
 
 // 将多幅单通道灰度图输出到一个图里，类似matlab的subplot
-void multi_image_64FC1_putin_one_window(const std::string& MultiShow_WinName, const vector<cv::Mat>& SrcImg_V, CvSize SubPlot, CvSize ImgMax_Size, int time_msec)
+void multi_images_64FC1_show_one_window(const std::string& MultiShow_WinName, const vector<cv::Mat>& SrcImg_V, CvSize SubPlot, CvSize ImgMax_Size, int time_msec)
 {
 	//Reference : http://blog.csdn.net/yangyangyang20092010/article/details/21740373
 
@@ -18,10 +17,21 @@ void multi_image_64FC1_putin_one_window(const std::string& MultiShow_WinName, co
 	//imgs[3] = imread("F:\\SA2014.jpg");
 	//MultiImage_OneWin("T", imgs, cvSize(2, 2), cvSize(400, 280));
 
+	int Img_Num = (int)SrcImg_V.size();
+	if (Img_Num < SubPlot.width * SubPlot.height)
+	{
+		cout << "Your SubPlot num Setting is too large !" << endl;
+		exit(0);
+	}
+
+	// select image based on the SubPlot size
+	vector<cv::Mat> SrcImg_V_Selected;
+	SrcImg_V_Selected.assign(SrcImg_V.begin(), SrcImg_V.begin() + SubPlot.width * SubPlot.height);
+
 	//Window's image
 	cv::Mat Disp_Img;
 	//Width of source image
-	CvSize Img_OrigSize = cvSize(SrcImg_V[0].cols, SrcImg_V[0].rows);
+	CvSize Img_OrigSize = cvSize(SrcImg_V_Selected[0].cols, SrcImg_V_Selected[0].rows);
 	//================ Set the width for displayed image =======================//
 	//Width vs height ratio of source image
 	float WH_Ratio_Orig = Img_OrigSize.width / (float)Img_OrigSize.height;
@@ -33,8 +43,8 @@ void multi_image_64FC1_putin_one_window(const std::string& MultiShow_WinName, co
 	else
 		ImgDisp_Size = cvSize(Img_OrigSize.width, Img_OrigSize.height);
 	//================ Check Image numbers with Subplot layout ======================//
-	int Img_Num = (int)SrcImg_V.size();
-	if (Img_Num > SubPlot.width * SubPlot.height)
+	int Img_Selected_Num = (int)SrcImg_V_Selected.size();
+	if (Img_Selected_Num > SubPlot.width * SubPlot.height)
 	{
 		cout << "Your SubPlot Setting is too small !" << endl;
 		exit(0);
@@ -54,7 +64,7 @@ void multi_image_64FC1_putin_one_window(const std::string& MultiShow_WinName, co
 	CvPoint LT_Pos = LT_BasePos;
 
 	// Display all images
-	for (int i = 0; i < Img_Num; i++)
+	for (int i = 0; i < Img_Selected_Num; i++)
 	{
 		// Obtain the left top position
 		if ((i%SubPlot.width == 0) && (LT_Pos.x != LT_BasePos.x))
@@ -64,7 +74,7 @@ void multi_image_64FC1_putin_one_window(const std::string& MultiShow_WinName, co
 		}
 		// Writting each to Window's Image
 		cv::Mat imgROI = Disp_Img(cv::Rect(LT_Pos.x, LT_Pos.y, ImgDisp_Size.width, ImgDisp_Size.height));
-		cv::resize(SrcImg_V[i], imgROI, cv::Size(ImgDisp_Size.width, ImgDisp_Size.height));
+		cv::resize(SrcImg_V_Selected[i], imgROI, cv::Size(ImgDisp_Size.width, ImgDisp_Size.height));
 		LT_Pos.x += (DispBlank_Gap.width + ImgDisp_Size.width);
 	}
 	// Get the screen size of computer
@@ -79,7 +89,7 @@ void multi_image_64FC1_putin_one_window(const std::string& MultiShow_WinName, co
 
 
 // 将多幅三通道彩图输出到一个图里，类似matlab的subplot
-void multi_image_8UC3_putin_one_window(const std::string& MultiShow_WinName, const vector<cv::Mat>& SrcImg_V, CvSize SubPlot, CvSize ImgMax_Size, int time_msec)
+void multi_images_8UC3_show_one_window(const std::string& MultiShow_WinName, const vector<cv::Mat>& SrcImg_V, CvSize SubPlot, CvSize ImgMax_Size, int time_msec)
 {
 	//Reference : http://blog.csdn.net/yangyangyang20092010/article/details/21740373
 
@@ -91,10 +101,21 @@ void multi_image_8UC3_putin_one_window(const std::string& MultiShow_WinName, con
 	//imgs[3] = imread("F:\\SA2014.jpg");
 	//MultiImage_OneWin("T", imgs, cvSize(2, 2), cvSize(400, 280));
 
+	int Img_Num = (int)SrcImg_V.size();
+	if (Img_Num < SubPlot.width * SubPlot.height)
+	{
+		cout << "Your SubPlot num Setting is too large !" << endl;
+		exit(0);
+	}
+
+	// select image based on the SubPlot size
+	vector<cv::Mat> SrcImg_V_Selected;
+	SrcImg_V_Selected.assign(SrcImg_V.begin(), SrcImg_V.begin() + SubPlot.width * SubPlot.height);
+
 	//Window's image
 	cv::Mat Disp_Img;
 	//Width of source image
-	CvSize Img_OrigSize = cvSize(SrcImg_V[0].cols, SrcImg_V[0].rows);
+	CvSize Img_OrigSize = cvSize(SrcImg_V_Selected[0].cols, SrcImg_V_Selected[0].rows);
 	//================ Set the width for displayed image =======================//
 	//Width vs height ratio of source image
 	float WH_Ratio_Orig = Img_OrigSize.width / (float)Img_OrigSize.height;
@@ -106,8 +127,8 @@ void multi_image_8UC3_putin_one_window(const std::string& MultiShow_WinName, con
 	else
 		ImgDisp_Size = cvSize(Img_OrigSize.width, Img_OrigSize.height);
 	//================ Check Image numbers with Subplot layout ======================//
-	int Img_Num = (int)SrcImg_V.size();
-	if (Img_Num > SubPlot.width * SubPlot.height)
+	int Img_Selected_Num = (int)SrcImg_V_Selected.size();
+	if (Img_Selected_Num > SubPlot.width * SubPlot.height)
 	{
 		cout << "Your SubPlot Setting is too small !" << endl;
 		exit(0);
@@ -127,7 +148,7 @@ void multi_image_8UC3_putin_one_window(const std::string& MultiShow_WinName, con
 	CvPoint LT_Pos = LT_BasePos;
 
 	// Display all images
-	for (int i = 0; i < Img_Num; i++)
+	for (int i = 0; i < Img_Selected_Num; i++)
 	{
 		// Obtain the left top position
 		if ((i%SubPlot.width == 0) && (LT_Pos.x != LT_BasePos.x))
@@ -137,7 +158,7 @@ void multi_image_8UC3_putin_one_window(const std::string& MultiShow_WinName, con
 		}
 		// Writting each to Window's Image
 		cv::Mat imgROI = Disp_Img(cv::Rect(LT_Pos.x, LT_Pos.y, ImgDisp_Size.width, ImgDisp_Size.height));
-		cv::resize(SrcImg_V[i], imgROI, cv::Size(ImgDisp_Size.width, ImgDisp_Size.height));
+		cv::resize(SrcImg_V_Selected[i], imgROI, cv::Size(ImgDisp_Size.width, ImgDisp_Size.height));
 		LT_Pos.x += (DispBlank_Gap.width + ImgDisp_Size.width);
 	}
 	// Get the screen size of computer

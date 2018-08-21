@@ -33,6 +33,9 @@
     <ClCompile Include="libraries\Math\maths_image_windows.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="libraries\Math\maths_vector.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="libraries\Math\maths.h">
@@ -48,6 +51,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="libraries\Math\maths_matrix.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="libraries\Math\maths_vector.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

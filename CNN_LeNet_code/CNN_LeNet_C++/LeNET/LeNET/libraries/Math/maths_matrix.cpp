@@ -33,6 +33,10 @@ void show_image_64FC1_as_matrix_double(const Mat &img)
 	{
 		for (int j = 0; j < col; j++)
 		{
+
+			cout.setf(ios::left); // 设置对齐方式
+			cout.width(8); //设置输出宽度
+			cout.fill('0'); //将多余的空格用0填充
 			cout << arr[i][j] << ' ';
 		}
 		cout << endl;
