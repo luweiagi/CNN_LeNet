@@ -14,20 +14,22 @@ void test()
 int main()
 {
 	test();
-	
-	// ******************************* 创建训练集 **************************************************** //
+
+	//*
+
+	// ****************************** 创建训练集 ***************************************************** //
 
 	// 加载训练集的样本图片
 	vector<Mat> train_x;
 	string file_addr = "../../../MnistData/TrainImg";
 	read_batch_images(file_addr, "bmp", 1, 1000, train_x);
 	images_convert_to_64FC1(train_x);
-	multi_images_64FC1_show_one_window("Multiple Images", train_x, CvSize(26, 18), CvSize(32, 32), 1000);
+	multi_images_64FC1_show_one_window("Multiple Images", train_x, CvSize(26, 18), CvSize(32, 32), 700);
 	
 	// 加载训练集的样本标签
 	vector<vector<double>> train_y;
 	set_target_class_one2ten(train_y,1000);
-	show_vector_vector_double_as_image_64FC1(train_y, 1000);
+	show_vector_vector_double_as_image_64FC1(train_y, 700);
 
 	// ****************************** 创建测试集 ***************************************************** //
 
@@ -40,21 +42,58 @@ int main()
 
 	// ****************************** 初始化CNN ****************************************************** //
 
+	// CNN网络结构设置
+	vector<Layer> layers;
+
+	Layer input_layer_1;// 第一层：输入层
+	input_layer_1.type = 'i'; input_layer_1.iChannel = 1; input_layer_1.iSizePic[0] = 32; input_layer_1.iSizePic[1] = 32;
+	layers.push_back(input_layer_1);
+
+	Layer convolutional_layer_2;// 第二层：卷积层
+	convolutional_layer_2.type = 'c'; convolutional_layer_2.iChannel = 2; convolutional_layer_2.iSizeKer = 5;
+	layers.push_back(convolutional_layer_2);
+
+	Layer subsampling_layer_3;// 第三层：降采样层
+	subsampling_layer_3.type = 's'; subsampling_layer_3.iSample = 2;
+	layers.push_back(subsampling_layer_3);
+
+	Layer convolutional_layer_4;// 第四层：卷积层
+	convolutional_layer_4.type = 'c'; convolutional_layer_4.iChannel = 4; convolutional_layer_4.iSizeKer = 5;
+	layers.push_back(convolutional_layer_4);
+
+	Layer subsampling_layer_5;// 第五层：降采样层
+	subsampling_layer_5.type = 's'; subsampling_layer_5.iSample = 2;
+	layers.push_back(subsampling_layer_5);
+
+	Layer fully_connected_layer_6;// 第六层：全连接层
+	fully_connected_layer_6.type = 'f'; fully_connected_layer_6.iChannel = 120;
+	layers.push_back(fully_connected_layer_6);
+
+	Layer fully_connected_layer_7;// 第七层：全连接层
+	fully_connected_layer_7.type = 'f'; fully_connected_layer_7.iChannel = 84;
+	layers.push_back(fully_connected_layer_7);
+
+	Layer fully_connected_layer_8;// 第八层：全连接层（输出层）
+	fully_connected_layer_8.type = 'f'; fully_connected_layer_8.iChannel = 10;
+	layers.push_back(fully_connected_layer_8);
+
 	// 定义初始化参数
 	float alpha = 2;// 学习率[0.1,3]
 	float eta = 0.5f;// 惯性系数[0,0.95], >=1不收敛，==0为不用惯性项
 	int batchsize = 10;// 每次用batchsize个样本计算一个delta调整一次权值，每十个样本做平均进行调节
 	int epochs = 25;// 训练集整体迭代次数
 
-	// 初始化CNN
-	CNN LeNet(alpha, eta, batchsize, epochs);
+	// 依据网络结构设置CNN.layers，初始化一个CNN网络
+	CNN LeNet(layers, alpha, eta, batchsize, epochs);
 
 	// ****************************** CNN训练 ******************************************************** //
 
+	// CNN网络训练
 	LeNet.train(train_x, train_y);
 
 	// ****************************** CNN测试 ******************************************************** //
 
+	// CNN网络测试，用测试样本来测试
 	double error_rate = LeNet.test(test_x, test_y);
 
 	// 测试结果输出

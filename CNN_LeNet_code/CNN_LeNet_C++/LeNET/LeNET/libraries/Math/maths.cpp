@@ -6,7 +6,7 @@
 
 
 // 类似matlab中的randperm函数，即得到0~num-1之间的打乱顺序后的数组
-void randperm(int serial_num[], int num)
+void randperm_array(int serial_num[], int num)
 {
 	for (int i = 0; i < num; i++)
 	{
@@ -25,5 +25,3 @@ void randperm(int serial_num[], int num)
 		serial_num[j] = temp;
 	}
 }
-
-

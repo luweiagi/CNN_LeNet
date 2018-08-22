@@ -65,6 +65,8 @@ void show_vector_vector_double_as_image_64FC1(const vector<vector<double>> &arra
 	imshow("图片", image);
 	// 等待time_msec后窗口自动关闭    
 	waitKey(time_msec);
+
+	destroyWindow("图片");
 }
 
 

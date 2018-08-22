@@ -25,6 +25,7 @@ for L = 2 : n                                                   % ¶ÔCNNÍøÂç²ãÊı×
                 % convnÊÇÈıÎ¬¾í»ı£¬´Ë´¦ÊÇ¹Ø¼ü
                 
                 z = z + convn(net.layers{L - 1}.X{I}, net.layers{L}.Ker{I}{J}, 'valid');
+
             end
             
             % ±¾²ãÒ»¸öÍ¨µÀÊä³ö¶ÔÓ¦Ò»¸ö¼ÓĞÔÆ«ÖÃnet.layers{L}.B{J},ÔÙ²ÉÓÃsigmoid¼¤»îº¯Êı

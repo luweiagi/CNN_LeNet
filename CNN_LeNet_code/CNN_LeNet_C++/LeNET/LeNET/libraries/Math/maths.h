@@ -5,4 +5,9 @@
 #include <maths_matrix.h>
 #include <maths_vector.h>
 
-void randperm(int serial_num[], int num);
+
+
+
+void randperm_array(int serial_num[], int num);
+
+
