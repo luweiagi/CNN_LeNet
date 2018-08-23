@@ -36,6 +36,9 @@
     <ClCompile Include="libraries\Math\maths_vector.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="libraries\Math\maths_convolution.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="libraries\Math\maths.h">
@@ -54,6 +57,12 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="libraries\Math\maths_vector.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="libraries\Math\vector_array.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="libraries\Math\maths_convolution.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

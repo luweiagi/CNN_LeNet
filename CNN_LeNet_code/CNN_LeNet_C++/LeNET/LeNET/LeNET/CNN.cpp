@@ -7,7 +7,7 @@ using namespace std;
 
 
 // CNN网络，训练
-void CNN::train(const vector<Mat> &train_x, const vector<vector<double>> &train_y)
+void CNN::train(const vector<array_2D_double> &train_x, const vector<vector<double>> &train_y)
 {
 	cout << "begin to train" << endl;
 
@@ -41,7 +41,7 @@ void CNN::train(const vector<Mat> &train_x, const vector<vector<double>> &train_
 		for (int L = 0; L < numbatches; L++)
 		{
 			// 取出打乱顺序后的batchsize个样本和对应的标签
-			vector<Mat> batch_train_x;
+			vector<array_2D_double> batch_train_x;
 			vector<vector<double>> batch_train_y;
 
 			for (int i = L*_batchsize; i < min((L + 1)*_batchsize, m); i++)
@@ -51,7 +51,7 @@ void CNN::train(const vector<Mat> &train_x, const vector<vector<double>> &train_
 			}
 			// 显示当前正在处理的批量图片（只显示10张，当批处理图片的数量小于10时会报错，这时需要修改显示的张数）
 			//string window_title = "Images from " + to_string(L*_batchsize) + " to " + to_string(min((L + 1)*_batchsize, m));
-			//multi_images_64FC1_show_one_window(window_title, batch_train_x, CvSize(5, 2), CvSize(32, 32), 150);
+			//vector_array_2D_double_show_one_window(window_title, batch_train_x, CvSize(5, 2), CvSize(32, 32), 150);
 
 			// 在当前的网络权值和网络输入下计算网络的输出(正向计算)
 			feed_forward(batch_train_x);
@@ -79,7 +79,7 @@ void CNN::train(const vector<Mat> &train_x, const vector<vector<double>> &train_
 
 
 // CNN网络，测试，返回错误率
-double CNN::test(const vector<Mat> &test_x, const vector<vector<double>> &test_y)
+double CNN::test(const vector<array_2D_double> &test_x, const vector<vector<double>> &test_y)
 {
 	cout << "begin to test" << endl;
 	return 0;
@@ -113,10 +113,7 @@ void CNN::init()
 			int fan_in = _layers.at(L-1).iChannel * pow(_layers.at(L).iSizeKer, 2);
 
 			// 对当前层的Ker和Ker_delta初始化维数，并赋初值
-			_layers.at(L).Ker.clear();
 			_layers.at(L).Ker.resize(_layers.at(L - 1).iChannel);
-
-			_layers.at(L).Ker_delta.clear();
 			_layers.at(L).Ker_delta.resize(_layers.at(L - 1).iChannel);
 
 			// 对本层输入通道数做循环
@@ -131,8 +128,8 @@ void CNN::init()
 					double maximum = (double)sqrt(6.0f / (fan_in + fan_out));
 
 					// "前一层所有通道",对"本层所有通道",层对层的全连接,卷积核权值W,进行均匀分布初始化,范围为:[-1,1]*sqrt(6/(fan_in+fan_out))
-					_layers.at(L).Ker[I][J] = rand_array_double(_layers.at(L).iSizeKer, _layers.at(L).iSizeKer, -maximum, maximum);
-					_layers.at(L).Ker_delta[I][J] = get_zero_array_double_same_size_as(_layers.at(L).Ker[I][J]);
+					_layers.at(L).Ker[I][J] = rand_array_2D_double(_layers.at(L).iSizeKer, _layers.at(L).iSizeKer, -maximum, maximum);
+					_layers.at(L).Ker_delta[I][J] = get_zero_array_2D_double_same_size_as(_layers.at(L).Ker[I][J]);
 				}
 			}
 
@@ -182,8 +179,8 @@ void CNN::init()
 
 				double maximum = (double)sqrt(6.0f / (onum + fvnum));
 				// 初始化当前层与上一层的连接权值
-				_layers.at(L).W = rand_array_double(fvnum, onum, -maximum, maximum);// 注意是W[I][J],I为上一层的数目，J为当前层数目
-				_layers.at(L).W_delta = get_zero_array_double_same_size_as(_layers.at(L).W);
+				_layers.at(L).W = rand_array_2D_double(fvnum, onum, -maximum, maximum);// 注意是W[I][J],I为上一层的数目，J为当前层数目
+				_layers.at(L).W_delta = get_zero_array_2D_double_same_size_as(_layers.at(L).W);
 
 				// 对本层输出通道加性偏置进行0值初始化
 				_layers.at(L).B.assign(onum, 0);
@@ -201,8 +198,8 @@ void CNN::init()
 
 				double maximum = (double)sqrt(6.0f / (onum + fvnum));
 				// 初始化当前层与上一层的连接权值
-				_layers.at(L).W = rand_array_double(fvnum, onum, -maximum, maximum);// 注意是W[I][J],I为上一层的数目，J为当前层数目
-				_layers.at(L).W_delta = get_zero_array_double_same_size_as(_layers.at(L).W);
+				_layers.at(L).W = rand_array_2D_double(fvnum, onum, -maximum, maximum);// 注意是W[I][J],I为上一层的数目，J为当前层数目
+				_layers.at(L).W_delta = get_zero_array_2D_double_same_size_as(_layers.at(L).W);
 
 				// 对本层输出通道加性偏置进行0值初始化
 				_layers.at(L).B.assign(onum, 0);
@@ -216,9 +213,62 @@ void CNN::init()
 
 
 // CNN网络,正向计算(批处理算法,核心是convn用法,和输出层批量映射)
-void CNN::feed_forward(const vector<Mat> &train_x)
+void CNN::feed_forward(const vector<array_2D_double> &train_x)
 {
-	;
+	// CNN网络层数
+	int n = _layers.size();
+
+	_layers.at(0).X.resize(1);
+	_layers.at(0).X.at(0) = train_x;
+
+	for (int L = 1; L < n; L++)
+	{
+		// ======================================================================
+		// 以下代码仅对第2,4层(卷积层)有效
+
+		if (_layers.at(L).type == 'c')
+		{
+			// 对本层输出通道数做循环
+			for (int J = 0; J < _layers.at(L).iChannel; J++)
+			{
+				// 对本层一个通道输出0值初始化(batchsize幅输入同时处理)
+				vector<array_2D_double> z = create_vector_array_2D_double(
+												_layers.at(L - 1).X.at(0).size(), 
+												_layers.at(L - 1).X.at(0).at(0).size() - _layers.at(L).iSizeKer + 1, 
+												_layers.at(L - 1).X.at(0).at(0).at(0).size() - _layers.at(L).iSizeKer + 1, 
+												0);
+
+				for (int I = 0; I < _layers.at(L - 1).iChannel; I++)
+				{
+					// 特别注意:
+					// _layers.at(L - 1).X(I)为_batchsize幅输入, 为三维矩阵
+					// _layers.at(L).Ker[I][J]为二维卷积核矩阵
+					// 这里采用了函数convn, 实现多个样本输入的同时处理
+					// convn是三维卷积，此处是关键
+					add_B_to_A_vector_array_2D_double(z, convolution_n_dim(_layers.at(L - 1).X.at(I), _layers.at(L).Ker.at(I).at(J)));
+				}
+			}
+		}
+
+		// ======================================================================
+		// 以下代码对第3,5层(下采样层)有效
+
+		if (_layers.at(L).type == 's')
+		{
+
+		}
+
+
+		// ======================================================================
+		// 以下代码仅对第2,4层(卷积层)有效
+
+		if (_layers.at(L).type == 'f')
+		{
+
+		}
+	}
+
+	//net.y=
 }
 
 

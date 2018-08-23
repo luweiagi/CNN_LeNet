@@ -25,20 +25,23 @@ typedef struct{
 	// 当前层的输入图片大小
 	int iSizePic[2];
 
-	// 当前层的卷积核大小[iSizeKer iSizeKer]
+	// 当前层的卷积核大小[row col]
 	int iSizeKer;// 只针对卷积层，其它层此参数无意义
 
+	// 当前层的输出
+	vector<array_3D_double> X;// 注意是_batchsize幅输入输出同时处理，所以不是2D，而是3D，维度为[_batchsize, iSizePic[0], iSizePic[1]]
+
 	// 前一层通道对当前层通道的卷积核
-	vector<vector<array_double>> Ker;// Ker[I][J], I为前一层通道数，J为当前层通道数。只针对卷积层，其它层此参数无意义
+	vector<vector<array_2D_double>> Ker;// Ker[I][J], I为前一层通道数，J为当前层通道数。只针对卷积层，其它层此参数无意义
 
 	// 前一层通道对当前层通道的卷积核的偏置
-	vector<vector<array_double>> Ker_delta;// Ker_delta[I][J], I为前一层通道数，J为当前层通道数。只针对卷积层，其它层此参数无意义
+	vector<vector<array_2D_double>> Ker_delta;// Ker_delta[I][J], I为前一层通道数，J为当前层通道数。只针对卷积层，其它层此参数无意义
 
 	// 当前层与上一层的连接权值
-	array_double W;// 只针对全连接层，其它层此参数无意义
+	array_2D_double W;// 只针对全连接层，其它层此参数无意义
 
 	// ？？？
-	array_double W_delta;// 只针对全连接层，其它层此参数无意义
+	array_2D_double W_delta;// 只针对全连接层，其它层此参数无意义
 
 	// 当前层输出通道的加性偏置
 	vector<double> B;
@@ -73,10 +76,10 @@ public:
 	}
 	
 	// CNN网络，训练
-	void train(const vector<Mat> &train_x, const vector<vector<double>> &train_y);
+	void train(const vector<array_2D_double> &train_x, const vector<vector<double>> &train_y);
 
 	// CNN网络，测试，返回错误率
-	double test(const vector<Mat> &test_x, const vector<vector<double>> &test_y);
+	double test(const vector<array_2D_double> &test_x, const vector<vector<double>> &test_y);
 
 
 	////////////////////// 非主要函数 /////////////////////////////////////////////
@@ -93,7 +96,7 @@ private:
 	void init();
 
 	// CNN网络，正向计算(批处理算法,核心是convn用法,和输出层批量映射)
-	void feed_forward(const vector<Mat> &train_x);
+	void feed_forward(const vector<array_2D_double> &train_x);
 
 	// CNN网络，反向传播(批处理算法)
 	void back_propagation(const vector<vector<double>> &train_y);

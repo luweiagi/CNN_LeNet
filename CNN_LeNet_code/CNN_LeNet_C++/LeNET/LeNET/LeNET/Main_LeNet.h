@@ -10,4 +10,4 @@ using namespace cv;
 using namespace std;
 
 
-void set_target_class_one2ten(vector<vector<double>> &target_class, int length);
+

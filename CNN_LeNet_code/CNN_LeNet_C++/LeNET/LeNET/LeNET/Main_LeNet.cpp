@@ -9,23 +9,69 @@
 void test()
 {
 
+	array_2D_double X = create_array_2D_double(8, 5, 1);
+
+	X[2][1] = 9;
+
+	print_array_2D_double(X);
+
+	array_2D_double Ker = create_array_2D_double(3, 2, 1);
+	array_2D_double Ker2 = create_array_2D_double(3, 2, 3);
+
+	cout << endl;
+
+	array_2D_double ddd = get_A_dot_product_B_array_2D_double(Ker, Ker2);
+
+	//print_array_2D_double(ddd);
+
+	ddd[2][1] = 0;
+
+	//cout << sum_of_array_2D_double(ddd) << endl;
+
+	/////////////////
+
+	cout << "conv" << endl;
+
+	array_2D_double eee = convolution_one_dim(X, Ker);
+
+	print_array_2D_double(eee);
+
+	/*
+	vector<array_2D_double> bbb = convolution_n_dim(aaa, Ker);
+
+	print_array_2D_double(aaa.at(0));
+
+	cout << endl;
+
+	print_array_2D_double(bbb.at(0));
+	*/
+
+
 }
 
 int main()
 {
-	test();
+	//test();
 
 	//*
 
 	// ****************************** 创建训练集 ***************************************************** //
 
 	// 加载训练集的样本图片
-	vector<Mat> train_x;
+	vector<Mat> train_x_Mat;
+	// 文件读取地址
 	string file_addr = "../../../MnistData/TrainImg";
-	read_batch_images(file_addr, "bmp", 1, 1000, train_x);
-	images_convert_to_64FC1(train_x);
-	multi_images_64FC1_show_one_window("Multiple Images", train_x, CvSize(26, 18), CvSize(32, 32), 700);
-	
+	// 批量读取图片
+	read_batch_images(file_addr, "bmp", 1, 1000, train_x_Mat);
+	// 转为灰度图
+	images_convert_to_64FC1(train_x_Mat);
+	// 由Mat图片格式转为CNN的array_2D_double格式
+	vector<array_2D_double> train_x = vector_image_64FC1_to_vector_array_2D_double(train_x_Mat);
+	// 归一化
+	normalize_vector_array_2D_double_from_0_to_1(train_x);
+	// 显示所读取的图片，即将要喂给CNN的训练数据
+	vector_array_2D_double_show_one_window("Multiple Images", train_x, CvSize(26, 18), CvSize(32, 32), 700);
+
 	// 加载训练集的样本标签
 	vector<vector<double>> train_y;
 	set_target_class_one2ten(train_y,1000);
@@ -34,11 +80,10 @@ int main()
 	// ****************************** 创建测试集 ***************************************************** //
 
 	// 创建测试集的样本图片
-	vector<Mat> test_x = train_x;
+	vector<array_2D_double> test_x = train_x;
 
 	// 创建测试集的样本标签
-	vector<vector<double>> test_y;
-	test_y.assign(train_y.begin(), train_y.end());
+	vector<vector<double>> test_y = train_y;
 
 	// ****************************** 初始化CNN ****************************************************** //
 
@@ -106,32 +151,6 @@ int main()
 	return 0;
 }
 
-
-void set_target_class_one2ten(vector<vector<double>> &target_class, int length)
-{
-	int segment_size = length / 10;
-	int i, j;
-	vector<double> one_hot;
-
-	for (i = 0; i <= 8; i++)
-	{
-		one_hot.assign(10, 0);
-		one_hot.at(i) = 1;
-
-		for (j = 0; j < segment_size; j++)
-		{
-			target_class.push_back(one_hot);
-		}
-	}
-
-	// 防止length被10除不开，比如length=1003，则最后的类别10为从900到1003，而不是900到1000。
-	one_hot.assign(10, 0);
-	one_hot.at(i) = 1;
-	for (j = i * segment_size; j < length; j++)
-	{
-		target_class.push_back(one_hot);
-	}
-}
 
 
 /*

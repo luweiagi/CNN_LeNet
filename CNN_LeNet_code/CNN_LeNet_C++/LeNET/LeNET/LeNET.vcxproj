@@ -148,6 +148,7 @@
   <ItemGroup>
     <ClCompile Include="LeNET\CNN.cpp" />
     <ClCompile Include="LeNET\Main_LeNet.cpp" />
+    <ClCompile Include="libraries\Math\maths_convolution.cpp" />
     <ClCompile Include="libraries\Math\maths.cpp" />
     <ClCompile Include="libraries\Math\maths_image.cpp" />
     <ClCompile Include="libraries\Math\maths_image_windows.cpp" />
@@ -158,9 +159,11 @@
     <ClInclude Include="LeNET\CNN.h" />
     <ClInclude Include="LeNET\Main_LeNet.h" />
     <ClInclude Include="libraries\Math\maths.h" />
+    <ClInclude Include="libraries\Math\maths_convolution.h" />
     <ClInclude Include="libraries\Math\maths_image.h" />
     <ClInclude Include="libraries\Math\maths_matrix.h" />
     <ClInclude Include="libraries\Math\maths_vector.h" />
+    <ClInclude Include="libraries\Math\vector_array.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

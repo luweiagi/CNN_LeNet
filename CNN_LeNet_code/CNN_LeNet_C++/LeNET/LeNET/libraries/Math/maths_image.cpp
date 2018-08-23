@@ -43,6 +43,21 @@ Mat vector_vector_double_to_Mat_64FC1(const vector<vector<double>> &array)
 }
 
 
+vector<Mat> vector_array_2D_double_to_vector_Mat_64FC1(const vector<array_2D_double> &vector_array)
+{
+	int size = vector_array.size();
+
+	vector<Mat> vector_Mat_ret(size);
+
+	for (int i = 0; i < size; i++)
+	{
+		vector_Mat_ret.at(i) = vector_vector_double_to_Mat_64FC1(vector_array.at(i));
+	}
+	
+	return vector_Mat_ret;
+}
+
+
 // 以图片的形式把矩阵显示出来
 // 调用此函数时，第一个参数必须写成array[0],而不能是array
 void show_matrix_double_as_image_64FC1(double *array, int row, int col, int time_msec)
