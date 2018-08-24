@@ -39,6 +39,9 @@
     <ClCompile Include="libraries\Math\maths_convolution.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="libraries\Math\maths_activation_function.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="libraries\Math\maths.h">
@@ -63,6 +66,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="libraries\Math\maths_convolution.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="libraries\Math\maths_activation_function.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

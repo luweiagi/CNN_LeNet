@@ -278,7 +278,7 @@ vector<array_2D_double> create_vector_array_2D_double(int vector_size, int array
 }
 
 
-void add_B_to_A_vector_array_2D_double(vector<array_2D_double> &vector_array_A, const vector<array_2D_double> &vector_array_B)
+vector<array_2D_double> add_A_B_vector_array_2D_double(const vector<array_2D_double> &vector_array_A, const vector<array_2D_double> &vector_array_B)
 {
 	int vector_size = vector_array_A.size();
 	int array_col = vector_array_A.at(0).size();
@@ -291,8 +291,10 @@ void add_B_to_A_vector_array_2D_double(vector<array_2D_double> &vector_array_A, 
 	if (vector_size != vector_size_B || array_col != array_col_B || array_row != array_row_B)
 	{
 		cout << "vector_array_A size is not same to vector_array_B size! " << endl << "add_vector_array_2D_double() stoped!" << endl;
-		return;
+		return vector_array_A;
 	}
+
+	vector<array_2D_double> vector_array_sum = vector_array_A;
 
 	for (int i = 0; i < vector_size; i++)
 	{
@@ -300,10 +302,35 @@ void add_B_to_A_vector_array_2D_double(vector<array_2D_double> &vector_array_A, 
 		{
 			for (int k = 0; k < array_row; k++)
 			{
-				vector_array_A.at(i).at(j).at(k) += vector_array_B.at(i).at(j).at(k);
+				vector_array_sum.at(i).at(j).at(k) = vector_array_A.at(i).at(j).at(k) + vector_array_B.at(i).at(j).at(k);
 			}
 		}
 	}
+
+	return vector_array_sum;
+}
+
+
+vector<array_2D_double> add_vector_array_2D_double_and_num_double(const vector<array_2D_double> &vector_array, const double &num)
+{
+	int vector_size = vector_array.size();
+	int array_col = vector_array.at(0).size();
+	int array_row = vector_array.at(0).at(0).size();
+
+	vector<array_2D_double> vector_array_sum = vector_array;
+
+	for (int i = 0; i < vector_size; i++)
+	{
+		for (int j = 0; j < array_col; j++)
+		{
+			for (int k = 0; k < array_row; k++)
+			{
+				vector_array_sum.at(i).at(j).at(k) = vector_array.at(i).at(j).at(k) + num;
+			}
+		}
+	}
+
+	return vector_array_sum;
 }
 
 

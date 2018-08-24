@@ -11,30 +11,48 @@ void test()
 
 	array_2D_double X = create_array_2D_double(8, 5, 1);
 
-	X[2][1] = 9;
+	
 
 	print_array_2D_double(X);
 
+	vector<array_2D_double> XX;
+
+	XX.assign(2, X);
+
+	XX[0][2][1] = 9;
+	XX[1][2][1] = 12;
+
 	array_2D_double Ker = create_array_2D_double(3, 2, 1);
-	array_2D_double Ker2 = create_array_2D_double(3, 2, 3);
+
+	vector<array_2D_double> Y = activation_function(XX, SoftMax);// convolution_n_dim(XX, Ker);
 
 	cout << endl;
 
-	array_2D_double ddd = get_A_dot_product_B_array_2D_double(Ker, Ker2);
+	print_array_2D_double(Y.at(0));
+
+	cout << endl;
+
+	print_array_2D_double(Y.at(1));
+
+	cout << endl;
+
+
+
+	//array_2D_double ddd = get_A_dot_product_B_array_2D_double(Ker, Ker2);
 
 	//print_array_2D_double(ddd);
 
-	ddd[2][1] = 0;
+	//ddd[2][1] = 0;
 
 	//cout << sum_of_array_2D_double(ddd) << endl;
 
 	/////////////////
 
-	cout << "conv" << endl;
+	//cout << "conv" << endl;
 
-	array_2D_double eee = convolution_one_dim(X, Ker);
+	//array_2D_double eee = convolution_one_dim(X, Ker);
 
-	print_array_2D_double(eee);
+	//print_array_2D_double(eee);
 
 	/*
 	vector<array_2D_double> bbb = convolution_n_dim(aaa, Ker);
@@ -51,9 +69,9 @@ void test()
 
 int main()
 {
-	//test();
+	test();
 
-	//*
+	/*
 
 	// ****************************** 创建训练集 ***************************************************** //
 
@@ -127,9 +145,10 @@ int main()
 	float eta = 0.5f;// 惯性系数[0,0.95], >=1不收敛，==0为不用惯性项
 	int batchsize = 10;// 每次用batchsize个样本计算一个delta调整一次权值，每十个样本做平均进行调节
 	int epochs = 25;// 训练集整体迭代次数
+	activation_function_type activ_func_type = SoftMax;// 激活函数类型
 
 	// 依据网络结构设置CNN.layers，初始化一个CNN网络
-	CNN LeNet(layers, alpha, eta, batchsize, epochs);
+	CNN LeNet(layers, alpha, eta, batchsize, epochs, activ_func_type);
 
 	// ****************************** CNN训练 ******************************************************** //
 

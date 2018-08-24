@@ -9,8 +9,10 @@
 #include <string>
 #include <maths.h>
 
+
 using namespace std;
 using namespace cv;
+
 
 typedef struct{
 	// 当前层的类别
@@ -63,8 +65,8 @@ class CNN
 public:
 
 	// 初始化CNN类
-	CNN(vector<Layer> layers, float alpha, float eta, int batchsize, int epochs)
-		:_layers(layers), _alpha(alpha), _eta(eta), _batchsize(batchsize), _epochs(epochs)
+	CNN(vector<Layer> layers, float alpha, float eta, int batchsize, int epochs, activation_function_type activ_func_type)
+		:_layers(layers), _alpha(alpha), _eta(eta), _batchsize(batchsize), _epochs(epochs), _activ_func_type(activ_func_type)
 	{
 		// 依据网络结构设置CNN.layers, 初始化一个CNN网络
 		init();
@@ -117,6 +119,9 @@ private:
 
 	// 训练集整体迭代次数
 	int _epochs;
+
+	// 激活函数类型
+	activation_function_type _activ_func_type;
 
 	// 历次迭代的均方误差
 	vector<double> _ERR;

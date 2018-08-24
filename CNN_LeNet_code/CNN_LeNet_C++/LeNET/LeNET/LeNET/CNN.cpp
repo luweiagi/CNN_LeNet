@@ -3,6 +3,7 @@
 #include <time.h>
 #include <iostream>
 
+
 using namespace std;
 
 
@@ -228,16 +229,23 @@ void CNN::feed_forward(const vector<array_2D_double> &train_x)
 
 		if (_layers.at(L).type == 'c')
 		{
+			// 特别注意:
+			// 卷积层涉及到三个运算 : (1)卷积, (2)偏置(加), (3)sigmoid映射
+
+			// 对当前层的输出做初始化
+			_layers.at(L).X.resize(_layers.at(L).iChannel);// 即为当前层每一个通道分配一个输出图
+
 			// 对本层输出通道数做循环
 			for (int J = 0; J < _layers.at(L).iChannel; J++)
 			{
-				// 对本层一个通道输出0值初始化(batchsize幅输入同时处理)
+				// 对当前层第J个通道的对上一层的所有卷积之和z，进行初始化(batchsize幅输入同时处理)
 				vector<array_2D_double> z = create_vector_array_2D_double(
 												_layers.at(L - 1).X.at(0).size(), 
 												_layers.at(L - 1).X.at(0).at(0).size() - _layers.at(L).iSizeKer + 1, 
 												_layers.at(L - 1).X.at(0).at(0).at(0).size() - _layers.at(L).iSizeKer + 1, 
 												0);
 
+				// 1.卷积
 				for (int I = 0; I < _layers.at(L - 1).iChannel; I++)
 				{
 					// 特别注意:
@@ -245,8 +253,14 @@ void CNN::feed_forward(const vector<array_2D_double> &train_x)
 					// _layers.at(L).Ker[I][J]为二维卷积核矩阵
 					// 这里采用了函数convn, 实现多个样本输入的同时处理
 					// convn是三维卷积，此处是关键
-					add_B_to_A_vector_array_2D_double(z, convolution_n_dim(_layers.at(L - 1).X.at(I), _layers.at(L).Ker.at(I).at(J)));
+					z = add_A_B_vector_array_2D_double(z, convolution_n_dim(_layers.at(L - 1).X.at(I), _layers.at(L).Ker.at(I).at(J)));
 				}
+
+				// 2.偏置(加)
+				_layers.at(L).X.at(J) = add_vector_array_2D_double_and_num_double(z, _layers.at(L).B.at(J));
+				
+				// 3.sigmoid映射
+				_layers.at(L).X.at(J) = activation_function(_layers.at(L).X.at(J), _activ_func_type);
 			}
 		}
 
@@ -257,7 +271,6 @@ void CNN::feed_forward(const vector<array_2D_double> &train_x)
 		{
 
 		}
-
 
 		// ======================================================================
 		// 以下代码仅对第2,4层(卷积层)有效

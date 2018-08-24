@@ -7,8 +7,11 @@
 #include <vector_array.h>
 
 using namespace std;
-
 using namespace cv;
+
+
+// C++ vector的用法（整理）
+// https://www.cnblogs.com/Nonono-nw/p/3462183.html
 
 
 void set_target_class_one2ten(vector<vector<double>> &target_class, int length);
@@ -41,7 +44,9 @@ vector<array_2D_double> get_zero_vector_array_2D_double_same_size_as(const vecto
 
 vector<array_2D_double> create_vector_array_2D_double(int vector_size, int array_row, int array_col, double value);
 
-void add_B_to_A_vector_array_2D_double(vector<array_2D_double> &vector_array_A, const vector<array_2D_double> &vector_array_B);
+vector<array_2D_double> add_A_B_vector_array_2D_double(const vector<array_2D_double> &vector_array_A, const vector<array_2D_double> &vector_array_B);
+
+vector<array_2D_double> add_vector_array_2D_double_and_num_double(const vector<array_2D_double> &vector_array, const double &num);
 
 void flip_xy_array_2D_double(array_2D_double &array);
 
