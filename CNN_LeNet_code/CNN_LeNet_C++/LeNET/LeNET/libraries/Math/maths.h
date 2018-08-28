@@ -7,6 +7,7 @@
 #include <maths_convolution.h>
 #include <vector_array.h>
 #include <maths_activation_function.h>
+#include <maths_down_sample.h>
 
 void randperm_array(int serial_num[], int num);
 

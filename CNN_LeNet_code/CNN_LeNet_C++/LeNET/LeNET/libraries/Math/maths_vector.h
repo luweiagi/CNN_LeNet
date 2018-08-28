@@ -16,45 +16,49 @@ using namespace cv;
 
 void set_target_class_one2ten(vector<vector<double>> &target_class, int length);
 
-vector<double> get_vector_double_n2m(int n, int m);
+vector<double> get_vector_n2m(int n, int m);
 
 vector<int> randperm_vector(int num);
 
-array_2D_double rand_array_2D_double(int col, int row, double minimum, double maximum);
+array2D rand_array2D(int col, int row, double minimum, double maximum);
+// class done
+array2D zero_array2D(int col, int row);
+// class done
+array2D create_array2D(int col, int row, double value);
+// class done
+void print_array2D(const array2D &array);
+// class done
+array2D get_zero_array2D_same_size_as(const array2D &array);
+// class done
+array2D get_array2D_from_image_64FC1(const Mat &img);
+// class2 done
+vector<array2D> vector_image_64FC1_to_vector_array2D(vector<Mat> &vector_img);
+// class done
+void normalize_array2D_from_0_to_1(array2D &array);
+// class2 done
+void normalize_vector_array2D_from_0_to_1(vector<array2D> &vector_array);
+// class2 done
+void zero_vector_array2D(vector<array2D> &vector_array);
 
-array_2D_double zero_array_2D_double(int col, int row);
+vector<array2D> get_zero_vector_array2D_same_size_as(const vector<array2D> &vector_array);
 
-array_2D_double create_array_2D_double(int col, int row, double value);
+vector<array2D> create_vector_array2D(int vector_size, int array_col, int array_row, double value);
 
-void print_array_2D_double(const array_2D_double &array);
+vector<array2D> get_A_add_B_vector_array2D(const vector<array2D> &vector_array_A, const vector<array2D> &vector_array_B);
 
-array_2D_double get_zero_array_2D_double_same_size_as(const array_2D_double &array);
+vector<array2D> add_vector_array2D_and_num(const vector<array2D> &vector_array, const double &num);
+// class done
+void flip_xy_array2D(array2D &array);
+// class done
+array2D get_specific_size_array2D_from_specific_position(const array2D &X, int size_col, int size_row, int pos_col, int pos_row);
+// class done
+array2D get_A_dot_product_B_array2D(const array2D &array_A, const array2D &array_B);
+// class done
+double sum_of_array2D(const array2D &array);
 
-array_2D_double image_64FC1_to_array_2D_double(const Mat &img);
+vector<array2D> equal_interval_sampling_vector_array2D(const vector<array2D> &vector_array, const int sample_num);
 
-vector<array_2D_double> vector_image_64FC1_to_vector_array_2D_double(vector<Mat> &vector_img);
-
-void normalize_array_2D_double_from_0_to_1(array_2D_double &array);
-
-void normalize_vector_array_2D_double_from_0_to_1(vector<array_2D_double> &vector_array);
-
-void zero_vector_array_2D_double(vector<array_2D_double> &vector_array);
-
-vector<array_2D_double> get_zero_vector_array_2D_double_same_size_as(const vector<array_2D_double> &vector_array);
-
-vector<array_2D_double> create_vector_array_2D_double(int vector_size, int array_row, int array_col, double value);
-
-vector<array_2D_double> add_A_B_vector_array_2D_double(const vector<array_2D_double> &vector_array_A, const vector<array_2D_double> &vector_array_B);
-
-vector<array_2D_double> add_vector_array_2D_double_and_num_double(const vector<array_2D_double> &vector_array, const double &num);
-
-void flip_xy_array_2D_double(array_2D_double &array);
-
-array_2D_double get_specific_size_array_2D_double_from_specific_position(const array_2D_double &X, int size_col, int size_row, int pos_col, int pos_row);
-
-array_2D_double get_A_dot_product_B_array_2D_double(const array_2D_double &array_A, const array_2D_double &array_B);
-
-double sum_of_array_2D_double(const array_2D_double &array);
+vector<array2D> get_A_dot_product_B_vector_array2D(const vector<array2D> &vector_array_A, const vector<array2D> &vector_array_B);
 
 
 template <typename T>

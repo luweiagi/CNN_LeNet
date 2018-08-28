@@ -31,7 +31,7 @@ void set_target_class_one2ten(vector<vector<double>> &target_class, int length)
 
 
 // 得到n~m的vector
-vector<double> get_vector_double_n2m(int n, int m)
+vector<double> get_vector_n2m(int n, int m)
 {
 	vector<double> vector_n2m;
 
@@ -76,11 +76,11 @@ vector<int> randperm_vector(int num)
 
 
 // 注意：col 是该矩阵的列， row是该矩阵的行
-array_2D_double rand_array_2D_double(int col, int row, double minimum, double maximum)
+array2D rand_array2D(int col, int row, double minimum, double maximum)
 {
 	int i, j;
 
-	array_2D_double array(col);
+	array2D array(col);
 
 	for (i = 0; i < col; i++)
 	{
@@ -100,31 +100,31 @@ array_2D_double rand_array_2D_double(int col, int row, double minimum, double ma
 
 
 // 注意：col 是该矩阵的列， row是该矩阵的行
-array_2D_double zero_array_2D_double(int col, int row)
+array2D zero_array2D(int col, int row)
 {
-	return create_array_2D_double(col, row, 0);
+	return create_array2D(col, row, 0);
 }
 
 
 // 注意：col 是该矩阵的列， row是该矩阵的行
-array_2D_double create_array_2D_double(int col, int row, double value)
+array2D create_array2D(int col, int row, double value)
 {
 	if (col <= 0 || row <= 0)
 	{
-		cout << "size < 0 !" << endl << "create_array_2D_double( ) stoped!" << endl;
+		cout << "size < 0 !" << endl << "create_array2D( ) stoped!" << endl;
 	}
 
 	vector<double> vector_temp;
 	vector_temp.assign(row, value);
 
-	array_2D_double array_2D_ret;
-	array_2D_ret.assign(col, vector_temp);
+	array2D array2D_ret;
+	array2D_ret.assign(col, vector_temp);
 
-	return array_2D_ret;
+	return array2D_ret;
 }
 
 
-void print_array_2D_double(const array_2D_double &array)
+void print_array2D(const array2D &array)
 {
 	int i, j;
 
@@ -140,11 +140,11 @@ void print_array_2D_double(const array_2D_double &array)
 }
 
 
-array_2D_double get_zero_array_2D_double_same_size_as(const array_2D_double &array)
+array2D get_zero_array2D_same_size_as(const array2D &array)
 {
 	int i, j;
 
-	array_2D_double array_ret = array;
+	array2D array_ret = array;
 
 	for (i = 0; i < array_ret.size(); i++)
 	{
@@ -155,15 +155,15 @@ array_2D_double get_zero_array_2D_double_same_size_as(const array_2D_double &arr
 }
 
 
-// 把图片转为array_2D_double
-array_2D_double image_64FC1_to_array_2D_double(const Mat &img)
+// 把图片转为array2D
+array2D get_array2D_from_image_64FC1(const Mat &img)
 {
 	int row, col, i;
 	row = img.rows;
 	col = img.cols;
 
 	// 初始化array_ret的大小尺寸
-	array_2D_double array_ret(col);
+	array2D array_ret(col);
 	for (i = 0; i < col; i++)
 	{
 		array_ret.at(i).resize(row);
@@ -183,26 +183,26 @@ array_2D_double image_64FC1_to_array_2D_double(const Mat &img)
 }
 
 
-vector<array_2D_double> vector_image_64FC1_to_vector_array_2D_double(vector<Mat> &vector_img)
+vector<array2D> vector_image_64FC1_to_vector_array2D(vector<Mat> &vector_img)
 {
 	int size = vector_img.size();
 
-	vector<array_2D_double> vector_array(size);
+	vector<array2D> vector_array(size);
 
 	for (int i = 0; i < size; i++)
 	{
-		vector_array.at(i) = image_64FC1_to_array_2D_double(vector_img.at(i));
+		vector_array.at(i) = get_array2D_from_image_64FC1(vector_img.at(i));
 	}
 
 	return vector_array;
 }
 
 
-void normalize_array_2D_double_from_0_to_1(array_2D_double &array)
+void normalize_array2D_from_0_to_1(array2D &array)
 {
 	// find min and max;
-	double min =  100000;
-	double max = -100000;
+	double min =  1000000;
+	double max = -1000000;
 
 	for (int i = 0; i < array.size(); i++)
 	{
@@ -232,53 +232,53 @@ void normalize_array_2D_double_from_0_to_1(array_2D_double &array)
 }
 
 
-void normalize_vector_array_2D_double_from_0_to_1(vector<array_2D_double> &vector_array)
+void normalize_vector_array2D_from_0_to_1(vector<array2D> &vector_array)
 {
 	for (int i = 0; i < vector_array.size(); i++)
 	{
-		normalize_array_2D_double_from_0_to_1(vector_array.at(i));
+		normalize_array2D_from_0_to_1(vector_array.at(i));
 	}
 }
 
 
-void zero_vector_array_2D_double(vector<array_2D_double> &vector_array)
+void zero_vector_array2D(vector<array2D> &vector_array)
 {
-	array_2D_double array_2D_zero = get_zero_array_2D_double_same_size_as(vector_array.at(1));
-	vector_array.assign(vector_array.size(), array_2D_zero);
+	array2D array2D_zero = get_zero_array2D_same_size_as(vector_array.at(1));
+	vector_array.assign(vector_array.size(), array2D_zero);
 }
 
 
-vector<array_2D_double> get_zero_vector_array_2D_double_same_size_as(const vector<array_2D_double> &vector_array)
+vector<array2D> get_zero_vector_array2D_same_size_as(const vector<array2D> &vector_array)
 {
-	vector<array_2D_double>array_ret = vector_array;
+	vector<array2D>array_ret = vector_array;
 
-	zero_vector_array_2D_double(array_ret);
+	zero_vector_array2D(array_ret);
 
 	return array_ret;
 }
 
 
-vector<array_2D_double> create_vector_array_2D_double(int vector_size, int array_col, int array_row, double value)
+vector<array2D> create_vector_array2D(int vector_size, int array_col, int array_row, double value)
 {
 	if (vector_size <= 0 || array_col <= 0 || array_row <= 0)
 	{
-		cout << "size < 0 !" << endl << "create_vector_array_2D_double( ) stoped!" << endl;
+		cout << "size < 0 !" << endl << "create_vector_array2D( ) stoped!" << endl;
 	}
 
 	vector<double> vector_temp;
 	vector_temp.assign(array_row, value);
 
-	array_2D_double array_2D_temp;
-	array_2D_temp.assign(array_col, vector_temp);
+	array2D array2D_temp;
+	array2D_temp.assign(array_col, vector_temp);
 
-	vector<array_2D_double> array_3D_ret;
-	array_3D_ret.assign(vector_size, array_2D_temp);
+	vector<array2D> array_3D_ret;
+	array_3D_ret.assign(vector_size, array2D_temp);
 
 	return array_3D_ret;
 }
 
 
-vector<array_2D_double> add_A_B_vector_array_2D_double(const vector<array_2D_double> &vector_array_A, const vector<array_2D_double> &vector_array_B)
+vector<array2D> get_A_add_B_vector_array2D(const vector<array2D> &vector_array_A, const vector<array2D> &vector_array_B)
 {
 	int vector_size = vector_array_A.size();
 	int array_col = vector_array_A.at(0).size();
@@ -290,11 +290,11 @@ vector<array_2D_double> add_A_B_vector_array_2D_double(const vector<array_2D_dou
 
 	if (vector_size != vector_size_B || array_col != array_col_B || array_row != array_row_B)
 	{
-		cout << "vector_array_A size is not same to vector_array_B size! " << endl << "add_vector_array_2D_double() stoped!" << endl;
+		cout << "vector_array_A size is not same to vector_array_B size! " << endl << "add_vector_array2D() stoped!" << endl;
 		return vector_array_A;
 	}
 
-	vector<array_2D_double> vector_array_sum = vector_array_A;
+	vector<array2D> vector_array_sum = vector_array_A;
 
 	for (int i = 0; i < vector_size; i++)
 	{
@@ -311,13 +311,13 @@ vector<array_2D_double> add_A_B_vector_array_2D_double(const vector<array_2D_dou
 }
 
 
-vector<array_2D_double> add_vector_array_2D_double_and_num_double(const vector<array_2D_double> &vector_array, const double &num)
+vector<array2D> add_vector_array2D_and_num(const vector<array2D> &vector_array, const double &num)
 {
 	int vector_size = vector_array.size();
 	int array_col = vector_array.at(0).size();
 	int array_row = vector_array.at(0).at(0).size();
 
-	vector<array_2D_double> vector_array_sum = vector_array;
+	vector<array2D> vector_array_sum = vector_array;
 
 	for (int i = 0; i < vector_size; i++)
 	{
@@ -334,7 +334,7 @@ vector<array_2D_double> add_vector_array_2D_double_and_num_double(const vector<a
 }
 
 
-void flip_xy_array_2D_double(array_2D_double &array)
+void flip_xy_array2D(array2D &array)
 {
 	for (int i = 0; i < array.size(); i++)
 	{
@@ -345,14 +345,14 @@ void flip_xy_array_2D_double(array_2D_double &array)
 }
 
 
-array_2D_double get_specific_size_array_2D_double_from_specific_position(const array_2D_double &X, int size_col, int size_row, int pos_col, int pos_row)
+array2D get_specific_size_array2D_from_specific_position(const array2D &X, int size_col, int size_row, int pos_col, int pos_row)
 {
 	if (size_col + pos_col > X.size() || size_row + pos_row > X.at(0).size())
 	{
-		cout << "pos and size have exceed range!" << endl << "get_specific_size_array_2D_double_from_specific_position() has stopped!" << endl;
+		cout << "pos and size have exceed range!" << endl << "get_specific_size_array2D_from_specific_position() has stopped!" << endl;
 	}
 
-	array_2D_double X_patch(size_col);
+	array2D X_patch(size_col);
 
 	for (int i = 0; i < size_col; i++)
 	{
@@ -366,7 +366,7 @@ array_2D_double get_specific_size_array_2D_double_from_specific_position(const a
 }
 
 
-array_2D_double get_A_dot_product_B_array_2D_double(const array_2D_double &array_A, const array_2D_double &array_B)
+array2D get_A_dot_product_B_array2D(const array2D &array_A, const array2D &array_B)
 {
 	int col_A = array_A.size();
 	int row_A = array_A.at(0).size();
@@ -375,11 +375,11 @@ array_2D_double get_A_dot_product_B_array_2D_double(const array_2D_double &array
 
 	if (col_A != col_B || row_A != row_B)
 	{
-		cout << "array_A size is not same as arrow_B size!" << endl << "get_A_dot_product_B_array_2D_double() has stopped!" << endl;
+		cout << "array_A size is not same as arrow_B size!" << endl << "get_A_dot_product_B_array2D() has stopped!" << endl;
 		return array_A;
 	}
 
-	array_2D_double array_AB = array_A;
+	array2D array_AB = array_A;
 
 	for (int i = 0; i < col_A; i++)
 	{
@@ -393,7 +393,7 @@ array_2D_double get_A_dot_product_B_array_2D_double(const array_2D_double &array
 }
 
 
-double sum_of_array_2D_double(const array_2D_double &array)
+double sum_of_array2D(const array2D &array)
 {
 	int col = array.size();
 	int row = array.at(0).size();
@@ -410,3 +410,64 @@ double sum_of_array_2D_double(const array_2D_double &array)
 
 	return sum_ret;
 }
+
+
+vector<array2D> equal_interval_sampling_vector_array2D(const vector<array2D> &vector_array, const int sample_num)
+{
+	int vector_size = vector_array.size();
+	int col = vector_array.at(0).size();
+	int row = vector_array.at(0).at(0).size();
+
+	int new_col = int((col + (sample_num - 1)) / sample_num); // int(3/2) = 1
+	int new_row = int((row + (sample_num - 1)) / sample_num);
+	if (new_col <= 0 || new_row <= 0)
+	{
+		cout << "array size is smaller than sample size!" << endl << "equal_interval_sampling_vector_array2D() stopped!" << endl;
+		return vector_array;
+	}
+
+	vector<array2D> sampled_vector_array = create_vector_array2D(vector_size, new_col, new_row, 0);
+
+	for (int i = 0; i < vector_size; i++)
+	{
+		for (int j = 0; j < new_col; j++)
+		{
+			for (int k = 0; k < new_row; k++)
+			{
+				sampled_vector_array.at(i).at(j).at(k) = vector_array.at(i).at(j * sample_num).at(k * sample_num);
+			}
+		}
+	}
+
+	return sampled_vector_array;
+}
+
+
+vector<array2D> get_A_dot_product_B_vector_array2D(const vector<array2D> &vector_array_A, const vector<array2D> &vector_array_B)
+{
+	int vector_size_A = vector_array_A.size();
+	int col_A = vector_array_A.at(0).size();
+	int row_A = vector_array_A.at(0).at(0).size();
+	int vector_size_B = vector_array_B.size();
+	int col_B = vector_array_B.at(0).size();
+	int row_B = vector_array_B.at(0).at(0).size();
+
+	if (vector_size_A != vector_size_B || col_A != col_B || row_A != row_B)
+	{
+		cout << "vector_array_A size is not same as vector_array_B size!" << endl << "get_A_dot_product_B_vector_array2D() has stopped!" << endl;
+		vector<array2D> temp;
+		return temp;
+	}
+
+	vector<array2D> AB_array2D;
+
+	AB_array2D.resize(vector_size_A);
+
+	for (int i = 0; i < vector_size_A; i++)
+	{
+		AB_array2D.at(i) = get_A_dot_product_B_array2D(vector_array_A.at(i), vector_array_B.at(i));
+	}
+
+	return AB_array2D;
+}
+

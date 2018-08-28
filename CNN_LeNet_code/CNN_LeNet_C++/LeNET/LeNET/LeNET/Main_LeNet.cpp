@@ -8,64 +8,45 @@
 
 void test()
 {
+	Mat train_x1 = imread("file/2.bmp", 0);//读取灰度图
+										   // normalize 归一化， 由0~255的uchar类型变为0~1的double类型
+	train_x1.convertTo(train_x1, CV_64FC1, 1 / 255.0);//其中dst为目标图， CV_32FC3为要转化的类型
 
-	array_2D_double X = create_array_2D_double(8, 5, 1);
+	Array2Dd a1(3, 2, 1.2);
+	Array2Dd a2(3, 2, 2.3);
+	
+	a1.from_image_64FC1(train_x1);
+	a2.from_image_64FC1(train_x1);
+
+	Array3Dd xxx;
+	xxx.push_back(a1);
+	xxx.push_back(a2);
+
+	xxx.at(0).print();
+	cout << endl;
+
+	xxx.at(1).print();
+	cout << endl;
+	
+	xxx.normalize();
+
+	xxx.at(0).print();
+	cout << endl;
+	xxx.at(1).print();
+	cout << endl;
 
 	
-
-	print_array_2D_double(X);
-
-	vector<array_2D_double> XX;
-
-	XX.assign(2, X);
-
-	XX[0][2][1] = 9;
-	XX[1][2][1] = 12;
-
-	array_2D_double Ker = create_array_2D_double(3, 2, 1);
-
-	vector<array_2D_double> Y = activation_function(XX, SoftMax);// convolution_n_dim(XX, Ker);
-
+	cout << "yyy = " << endl;
+	
+	Array3Dd yyy;
+	yyy.set_zero_same_size_as(xxx);
+	yyy.at(0).print();
 	cout << endl;
-
-	print_array_2D_double(Y.at(0));
-
+	yyy.at(1).print();
 	cout << endl;
-
-	print_array_2D_double(Y.at(1));
-
-	cout << endl;
-
-
-
-	//array_2D_double ddd = get_A_dot_product_B_array_2D_double(Ker, Ker2);
-
-	//print_array_2D_double(ddd);
-
-	//ddd[2][1] = 0;
-
-	//cout << sum_of_array_2D_double(ddd) << endl;
-
-	/////////////////
-
-	//cout << "conv" << endl;
-
-	//array_2D_double eee = convolution_one_dim(X, Ker);
-
-	//print_array_2D_double(eee);
-
-	/*
-	vector<array_2D_double> bbb = convolution_n_dim(aaa, Ker);
-
-	print_array_2D_double(aaa.at(0));
-
-	cout << endl;
-
-	print_array_2D_double(bbb.at(0));
-	*/
-
-
+	return;
 }
+
 
 int main()
 {
@@ -83,12 +64,12 @@ int main()
 	read_batch_images(file_addr, "bmp", 1, 1000, train_x_Mat);
 	// 转为灰度图
 	images_convert_to_64FC1(train_x_Mat);
-	// 由Mat图片格式转为CNN的array_2D_double格式
-	vector<array_2D_double> train_x = vector_image_64FC1_to_vector_array_2D_double(train_x_Mat);
+	// 由Mat图片格式转为CNN的array2D格式
+	vector<array2D> train_x = vector_image_64FC1_to_vector_array2D(train_x_Mat);
 	// 归一化
-	normalize_vector_array_2D_double_from_0_to_1(train_x);
+	normalize_vector_array2D_from_0_to_1(train_x);
 	// 显示所读取的图片，即将要喂给CNN的训练数据
-	vector_array_2D_double_show_one_window("Multiple Images", train_x, CvSize(26, 18), CvSize(32, 32), 700);
+	vector_array2D_show_one_window("Multiple Images", train_x, CvSize(26, 18), CvSize(32, 32), 700);
 
 	// 加载训练集的样本标签
 	vector<vector<double>> train_y;
@@ -98,7 +79,7 @@ int main()
 	// ****************************** 创建测试集 ***************************************************** //
 
 	// 创建测试集的样本图片
-	vector<array_2D_double> test_x = train_x;
+	vector<array2D> test_x = train_x;
 
 	// 创建测试集的样本标签
 	vector<vector<double>> test_y = train_y;
@@ -146,9 +127,10 @@ int main()
 	int batchsize = 10;// 每次用batchsize个样本计算一个delta调整一次权值，每十个样本做平均进行调节
 	int epochs = 25;// 训练集整体迭代次数
 	activation_function_type activ_func_type = SoftMax;// 激活函数类型
+	down_sample_type down_samp_type = MeanPooling;// 降采样（池化）类型
 
 	// 依据网络结构设置CNN.layers，初始化一个CNN网络
-	CNN LeNet(layers, alpha, eta, batchsize, epochs, activ_func_type);
+	CNN LeNet(layers, alpha, eta, batchsize, epochs, activ_func_type, down_samp_type);
 
 	// ****************************** CNN训练 ******************************************************** //
 

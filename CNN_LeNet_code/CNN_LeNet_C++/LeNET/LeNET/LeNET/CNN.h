@@ -8,7 +8,7 @@
 #include <vector>
 #include <string>
 #include <maths.h>
-
+#include <Array.h>
 
 using namespace std;
 using namespace cv;
@@ -31,19 +31,19 @@ typedef struct{
 	int iSizeKer;// 只针对卷积层，其它层此参数无意义
 
 	// 当前层的输出
-	vector<array_3D_double> X;// 注意是_batchsize幅输入输出同时处理，所以不是2D，而是3D，维度为[_batchsize, iSizePic[0], iSizePic[1]]
+	vector<array_3D> X;// 注意是_batchsize幅输入输出同时处理，所以不是2D，而是3D，维度为[_batchsize, iSizePic[0], iSizePic[1]]
 
 	// 前一层通道对当前层通道的卷积核
-	vector<vector<array_2D_double>> Ker;// Ker[I][J], I为前一层通道数，J为当前层通道数。只针对卷积层，其它层此参数无意义
+	vector<vector<array2D>> Ker;// Ker[I][J], I为前一层通道数，J为当前层通道数。只针对卷积层，其它层此参数无意义
 
 	// 前一层通道对当前层通道的卷积核的偏置
-	vector<vector<array_2D_double>> Ker_delta;// Ker_delta[I][J], I为前一层通道数，J为当前层通道数。只针对卷积层，其它层此参数无意义
+	vector<vector<array2D>> Ker_delta;// Ker_delta[I][J], I为前一层通道数，J为当前层通道数。只针对卷积层，其它层此参数无意义
 
 	// 当前层与上一层的连接权值
-	array_2D_double W;// 只针对全连接层，其它层此参数无意义
+	array2D W;// 只针对全连接层，其它层此参数无意义
 
 	// ？？？
-	array_2D_double W_delta;// 只针对全连接层，其它层此参数无意义
+	array2D W_delta;// 只针对全连接层，其它层此参数无意义
 
 	// 当前层输出通道的加性偏置
 	vector<double> B;
@@ -57,6 +57,10 @@ typedef struct{
 	// ？？？
 	vector<double> Beta_delta;// 只针对下采样层，其它层此参数无意义
 
+	// 下采样的输入
+	vector<array_3D> X_down;// 注意是_batchsize幅输入输出同时处理，所以不是2D，而是3D，维度为[_batchsize, iSizePic[0], iSizePic[1]]
+								   // 只针对下采样层，其它层此参数无意义
+
 } Layer;
 
 
@@ -65,8 +69,8 @@ class CNN
 public:
 
 	// 初始化CNN类
-	CNN(vector<Layer> layers, float alpha, float eta, int batchsize, int epochs, activation_function_type activ_func_type)
-		:_layers(layers), _alpha(alpha), _eta(eta), _batchsize(batchsize), _epochs(epochs), _activ_func_type(activ_func_type)
+	CNN(vector<Layer> layers, float alpha, float eta, int batchsize, int epochs, activation_function_type activ_func_type, down_sample_type down_samp_type)
+		:_layers(layers), _alpha(alpha), _eta(eta), _batchsize(batchsize), _epochs(epochs), _activation_func_type(activ_func_type), _down_sample_type(down_samp_type)
 	{
 		// 依据网络结构设置CNN.layers, 初始化一个CNN网络
 		init();
@@ -78,10 +82,10 @@ public:
 	}
 	
 	// CNN网络，训练
-	void train(const vector<array_2D_double> &train_x, const vector<vector<double>> &train_y);
+	void train(const vector<array2D> &train_x, const vector<vector<double>> &train_y);
 
 	// CNN网络，测试，返回错误率
-	double test(const vector<array_2D_double> &test_x, const vector<vector<double>> &test_y);
+	double test(const vector<array2D> &test_x, const vector<vector<double>> &test_y);
 
 
 	////////////////////// 非主要函数 /////////////////////////////////////////////
@@ -98,7 +102,7 @@ private:
 	void init();
 
 	// CNN网络，正向计算(批处理算法,核心是convn用法,和输出层批量映射)
-	void feed_forward(const vector<array_2D_double> &train_x);
+	void feed_forward(const vector<array2D> &train_x);
 
 	// CNN网络，反向传播(批处理算法)
 	void back_propagation(const vector<vector<double>> &train_y);
@@ -121,7 +125,10 @@ private:
 	int _epochs;
 
 	// 激活函数类型
-	activation_function_type _activ_func_type;
+	activation_function_type _activation_func_type;
+
+	// 降采样（池化）类型
+	down_sample_type _down_sample_type;
 
 	// 历次迭代的均方误差
 	vector<double> _ERR;

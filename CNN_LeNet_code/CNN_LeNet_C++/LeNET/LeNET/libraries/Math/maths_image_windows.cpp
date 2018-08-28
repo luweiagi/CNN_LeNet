@@ -174,8 +174,8 @@ void vector_Mat_8UC3_show_one_window(const std::string& MultiShow_WinName, const
 }
 
 
-// 将多幅array_2D_double输出到一个图里，类似matlab的subplot。 注意，这里应当保证array_2D_double的值介于0~1之间
-void vector_array_2D_double_show_one_window(const std::string& MultiShow_WinName, const vector<array_2D_double>& vector_array, CvSize SubPlot, CvSize ImgMax_Size, int time_msec)
+// 将多幅array2D输出到一个图里，类似matlab的subplot。 注意，这里应当保证array2D的值介于0~1之间
+void vector_array2D_show_one_window(const std::string& MultiShow_WinName, const vector<array2D>& vector_array, CvSize SubPlot, CvSize ImgMax_Size, int time_msec)
 {
 	//Reference : http://blog.csdn.net/yangyangyang20092010/article/details/21740373
 
@@ -187,7 +187,7 @@ void vector_array_2D_double_show_one_window(const std::string& MultiShow_WinName
 	//imgs[3] = imread("F:\\SA2014.jpg");
 	//MultiImage_OneWin("T", imgs, cvSize(2, 2), cvSize(400, 280));
 
-	vector<cv::Mat> SrcImg_V = vector_array_2D_double_to_vector_Mat_64FC1(vector_array);
+	vector<cv::Mat> SrcImg_V = vector_array2D_to_vector_Mat_64FC1(vector_array);
 
 	int Img_Num = (int)SrcImg_V.size();
 	if (Img_Num < SubPlot.width * SubPlot.height)
