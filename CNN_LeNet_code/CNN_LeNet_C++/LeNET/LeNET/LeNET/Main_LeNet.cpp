@@ -12,38 +12,18 @@ void test()
 										   // normalize 归一化， 由0~255的uchar类型变为0~1的double类型
 	train_x1.convertTo(train_x1, CV_64FC1, 1 / 255.0);//其中dst为目标图， CV_32FC3为要转化的类型
 
-	Array2Dd a1(3, 2, 1.2);
-	Array2Dd a2(3, 2, 2.3);
-	
-	a1.from_image_64FC1(train_x1);
-	a2.from_image_64FC1(train_x1);
+	Array2Dd xxx, yyy;
 
-	Array3Dd xxx;
-	xxx.push_back(a1);
-	xxx.push_back(a2);
+	xxx.create(3, 2, 2);
+	yyy.create(3, 2, 2.2);
 
-	xxx.at(0).print();
-	cout << endl;
+	Array3Dd zzz;
+	zzz.push_back(xxx);
+	zzz.push_back(yyy);
 
-	xxx.at(1).print();
-	cout << endl;
-	
-	xxx.normalize();
+	zzz.at(0).print();
+	zzz.at(1).print();
 
-	xxx.at(0).print();
-	cout << endl;
-	xxx.at(1).print();
-	cout << endl;
-
-	
-	cout << "yyy = " << endl;
-	
-	Array3Dd yyy;
-	yyy.set_zero_same_size_as(xxx);
-	yyy.at(0).print();
-	cout << endl;
-	yyy.at(1).print();
-	cout << endl;
 	return;
 }
 
