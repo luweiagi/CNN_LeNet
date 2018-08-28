@@ -5,8 +5,8 @@
 
 using namespace std;
 
-vector<array_2D_double> convolution_n_dim(const vector<array_2D_double> &X, const array_2D_double &Ker);
+vector<array2D> convolution_n_dim(const vector<array2D> &X, const array2D &Ker);
 
-array_2D_double convolution_one_dim(array_2D_double X, array_2D_double Ker);
+array2D convolution_one_dim(array2D X, array2D Ker);
 
-void change_X_size_to_fit_Ker(array_2D_double &X, const array_2D_double &Ker);
+void change_X_size_to_fit_Ker(array2D &X, const array2D &Ker);

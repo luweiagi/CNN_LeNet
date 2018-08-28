@@ -3,7 +3,7 @@
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
-    <IncludePath>LeNET;libraries\Math;C:\Program Files\opencv\build\include;C:\Program Files\opencv\build\include\opencv;C:\Program Files\opencv\build\include\opencv2;$(IncludePath)</IncludePath>
+    <IncludePath>LeNET;libraries\Math;libraries\Array;C:\Program Files\opencv\build\include;C:\Program Files\opencv\build\include\opencv;C:\Program Files\opencv\build\include\opencv2;$(IncludePath)</IncludePath>
     <LibraryPath>C:\Program Files\opencv\build\x64\vc14\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup>

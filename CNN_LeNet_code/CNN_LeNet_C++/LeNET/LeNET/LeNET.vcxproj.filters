@@ -13,63 +13,93 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="源文件\Math">
+      <UniqueIdentifier>{b3771de2-ef45-43bc-95a3-a56574620bd6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\Math">
+      <UniqueIdentifier>{11ea8f16-afe3-4be2-a53c-d437d9a32f6f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\LeNet">
+      <UniqueIdentifier>{233783f8-8e74-44dc-852d-0628120aced9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\Array">
+      <UniqueIdentifier>{0cfa4362-d470-4fe0-87d1-de8c48612247}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\Array">
+      <UniqueIdentifier>{ef31153c-24cc-4dc5-ae44-6c16084b2426}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\LeNet">
+      <UniqueIdentifier>{a2d86a2c-904c-4266-b07d-24b3e1ac2891}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="LeNET\CNN.cpp">
+      <Filter>源文件\LeNet</Filter>
+    </ClCompile>
     <ClCompile Include="LeNET\Main_LeNet.cpp">
-      <Filter>源文件</Filter>
+      <Filter>源文件\LeNet</Filter>
     </ClCompile>
     <ClCompile Include="libraries\Math\maths.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="LeNET\CNN.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="libraries\Math\maths_image.cpp">
-      <Filter>源文件</Filter>
+      <Filter>源文件\Math</Filter>
     </ClCompile>
     <ClCompile Include="libraries\Math\maths_matrix.cpp">
-      <Filter>源文件</Filter>
+      <Filter>源文件\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="libraries\Math\maths_image.cpp">
+      <Filter>源文件\Math</Filter>
     </ClCompile>
     <ClCompile Include="libraries\Math\maths_image_windows.cpp">
-      <Filter>源文件</Filter>
+      <Filter>源文件\Math</Filter>
     </ClCompile>
     <ClCompile Include="libraries\Math\maths_vector.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="libraries\Math\maths_convolution.cpp">
-      <Filter>源文件</Filter>
+      <Filter>源文件\Math</Filter>
     </ClCompile>
     <ClCompile Include="libraries\Math\maths_activation_function.cpp">
-      <Filter>源文件</Filter>
+      <Filter>源文件\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="libraries\Math\maths_convolution.cpp">
+      <Filter>源文件\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="libraries\Math\maths_down_sample.cpp">
+      <Filter>源文件\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="libraries\Array\Array2D.cpp">
+      <Filter>源文件\Array</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="libraries\Math\maths.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="LeNET\CNN.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="LeNET\Main_LeNet.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="libraries\Math\maths_image.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="libraries\Math\maths_matrix.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="libraries\Math\maths_vector.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="libraries\Math\vector_array.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="libraries\Math\maths_convolution.h">
-      <Filter>头文件</Filter>
+      <Filter>头文件\Math</Filter>
     </ClInclude>
     <ClInclude Include="libraries\Math\maths_activation_function.h">
-      <Filter>头文件</Filter>
+      <Filter>头文件\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="libraries\Math\maths_convolution.h">
+      <Filter>头文件\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="libraries\Math\maths_down_sample.h">
+      <Filter>头文件\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="libraries\Math\maths_image.h">
+      <Filter>头文件\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="libraries\Math\maths_matrix.h">
+      <Filter>头文件\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="libraries\Math\maths_vector.h">
+      <Filter>头文件\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="libraries\Math\vector_array.h">
+      <Filter>头文件\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="LeNET\CNN.h">
+      <Filter>头文件\LeNet</Filter>
+    </ClInclude>
+    <ClInclude Include="LeNET\Main_LeNet.h">
+      <Filter>头文件\LeNet</Filter>
+    </ClInclude>
+    <ClInclude Include="libraries\Array\Array2D.h">
+      <Filter>头文件\Array</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -43,7 +43,7 @@ Mat vector_vector_double_to_Mat_64FC1(const vector<vector<double>> &array)
 }
 
 
-vector<Mat> vector_array_2D_double_to_vector_Mat_64FC1(const vector<array_2D_double> &vector_array)
+vector<Mat> vector_array2D_to_vector_Mat_64FC1(const vector<array2D> &vector_array)
 {
 	int size = vector_array.size();
 

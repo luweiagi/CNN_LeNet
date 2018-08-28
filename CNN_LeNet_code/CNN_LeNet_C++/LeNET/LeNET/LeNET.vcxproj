@@ -148,9 +148,11 @@
   <ItemGroup>
     <ClCompile Include="LeNET\CNN.cpp" />
     <ClCompile Include="LeNET\Main_LeNet.cpp" />
+    <ClCompile Include="libraries\Array\Array2D.cpp" />
     <ClCompile Include="libraries\Math\maths_activation_function.cpp" />
     <ClCompile Include="libraries\Math\maths_convolution.cpp" />
     <ClCompile Include="libraries\Math\maths.cpp" />
+    <ClCompile Include="libraries\Math\maths_down_sample.cpp" />
     <ClCompile Include="libraries\Math\maths_image.cpp" />
     <ClCompile Include="libraries\Math\maths_image_windows.cpp" />
     <ClCompile Include="libraries\Math\maths_matrix.cpp" />
@@ -159,9 +161,11 @@
   <ItemGroup>
     <ClInclude Include="LeNET\CNN.h" />
     <ClInclude Include="LeNET\Main_LeNet.h" />
+    <ClInclude Include="libraries\Array\Array2D.h" />
     <ClInclude Include="libraries\Math\maths.h" />
     <ClInclude Include="libraries\Math\maths_activation_function.h" />
     <ClInclude Include="libraries\Math\maths_convolution.h" />
+    <ClInclude Include="libraries\Math\maths_down_sample.h" />
     <ClInclude Include="libraries\Math\maths_image.h" />
     <ClInclude Include="libraries\Math\maths_matrix.h" />
     <ClInclude Include="libraries\Math\maths_vector.h" />
