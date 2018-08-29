@@ -1,13 +1,14 @@
 // 卷积运算
 #include <maths_convolution.h>
 
-vector<array2D> convolution_n_dim(const vector<array2D> &X, const array2D &Ker)
+
+Array3Dd convolution_n_dim(const Array3Dd &X, const Array2Dd &Ker)
 {
-	vector<array2D> convn;
+	Array3Dd convn;
 
 	for (int i = 0; i < X.size(); i++)
 	{
-		array2D conv = convolution_one_dim(X.at(i), Ker);
+		Array2Dd conv = convolution_one_dim(X.at(i), Ker);
 		convn.push_back(conv);
 	}
 
@@ -15,7 +16,7 @@ vector<array2D> convolution_n_dim(const vector<array2D> &X, const array2D &Ker)
 }
 
 
-array2D convolution_one_dim(array2D X, array2D Ker)
+Array2Dd convolution_one_dim(Array2Dd X, Array2Dd Ker)
 {
 	int X_row = X.at(0).size();
 	int X_col = X.size();
@@ -36,22 +37,22 @@ array2D convolution_one_dim(array2D X, array2D Ker)
 	// 创建卷积结果输出变量conv并初始化为0
 	int conv_row = X.at(0).size() - Ker.at(0).size() + 1;
 	int conv_col = X.size() - Ker.size() + 1;
-	array2D conv = zero_array2D(conv_col, conv_row);
+	Array2Dd conv(conv_col, conv_row, 0);
 
 	// 对卷积核进行xy轴向的翻转
-	flip_xy_array2D(Ker);
+	Ker.flip_xy();
 
 	// 这是用来和卷积核相乘的那一块X的区域
-	array2D X_patch = get_zero_array2D_same_size_as(Ker);
+	Array2Dd X_patch;
 
 	// 开始进行卷积
 	for (int i = 0; i < conv_col; i++)
 	{
 		for (int j = 0; j < conv_row; j++)
 		{
-			X_patch = get_specific_size_array2D_from_specific_position(X, Ker_col, Ker_row, i, j);
+			X_patch.get_specific_patch(X, Ker_col, Ker_row, i, j);
 			// conv[i][j] = sum(X_patch .* Ker);
-			conv.at(i).at(j) = sum_of_array2D(get_A_dot_product_B_array2D(X_patch, Ker));
+			conv.at(i).at(j) = (X_patch * Ker).sum();
 		}
 	}
 
@@ -60,7 +61,7 @@ array2D convolution_one_dim(array2D X, array2D Ker)
 
 
 // 如果要卷积的对象的尺寸小于卷积核的尺寸，则将卷积对象的尺寸扩展（复制边缘）到卷积和的尺寸。
-void change_X_size_to_fit_Ker(array2D &X, const array2D &Ker)
+void change_X_size_to_fit_Ker(Array2Dd &X, const Array2Dd &Ker)
 {
 	int X_row = X.at(0).size();
 	int X_col = X.size();

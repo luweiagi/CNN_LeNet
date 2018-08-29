@@ -1,12 +1,12 @@
 #pragma once
 
-#include <vector_array.h>
+#include <Array.h>
 #include <maths.h>
 
 using namespace std;
 
-vector<array2D> convolution_n_dim(const vector<array2D> &X, const array2D &Ker);
+Array3Dd convolution_n_dim(const Array3Dd &X, const Array2Dd &Ker);
 
-array2D convolution_one_dim(array2D X, array2D Ker);
+Array2Dd convolution_one_dim(Array2Dd X, Array2Dd Ker);
 
-void change_X_size_to_fit_Ker(array2D &X, const array2D &Ker);
+void change_X_size_to_fit_Ker(Array2Dd &X, const Array2Dd &Ker);

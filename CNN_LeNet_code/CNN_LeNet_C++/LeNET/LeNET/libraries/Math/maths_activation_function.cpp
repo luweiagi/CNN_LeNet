@@ -3,8 +3,7 @@
 #include <maths.h>
 #include <math.h>
 
-
-vector<array2D> activation_function(const vector<array2D> &vector_array, activation_function_type activ_func_type)
+Array3Dd activation_function(const Array3Dd &vector_array, activation_function_type activ_func_type)
 {
 	switch (activ_func_type)
 	{
@@ -20,27 +19,27 @@ vector<array2D> activation_function(const vector<array2D> &vector_array, activat
 		}
 		default:
 		{
-			// ∑µªÿ¡„
-			return get_zero_vector_array2D_same_size_as(vector_array);
+			Array3Dd temp;
+			return temp;
 			break;
 		}
 	}
 }
 
 
-vector<array2D> soft_max(const vector<array2D> &vector_array)
+Array3Dd soft_max(const Array3Dd &vector_array)
 {
-	int vector_size = vector_array.size();
-	int array_col = vector_array.at(0).size();
-	int array_row = vector_array.at(0).at(0).size();
+	int page = vector_array.size();
+	int col = vector_array.at(0).size();
+	int row = vector_array.at(0).at(0).size();
 
-	vector<array2D> vector_array_sigmoid = vector_array;
+	Array3Dd vector_array_sigmoid = vector_array;
 
-	for (int i = 0; i < vector_size; i++)
+	for (int i = 0; i < page; i++)
 	{
-		for (int j = 0; j < array_col; j++)
+		for (int j = 0; j < col; j++)
 		{
-			for (int k = 0; k < array_row; k++)
+			for (int k = 0; k < row; k++)
 			{
 				// sigmoid function: y = 1 / (1 + exp(-x))
 				double exp_x = exp(- vector_array.at(i).at(j).at(k));
@@ -53,9 +52,9 @@ vector<array2D> soft_max(const vector<array2D> &vector_array)
 }
 
 
-vector<array2D> relu(const vector<array2D> &vector_array)
+Array3Dd relu(const Array3Dd &vector_array)
 {
 	// ToDo
-	// ∑µªÿ¡„
-	return get_zero_vector_array2D_same_size_as(vector_array);
+	Array3Dd temp;
+	return temp;
 }

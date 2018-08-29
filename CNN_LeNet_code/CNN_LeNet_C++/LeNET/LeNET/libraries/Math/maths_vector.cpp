@@ -3,6 +3,7 @@
 #include <time.h>
 #include<algorithm>
 
+
 void set_target_class_one2ten(vector<vector<double>> &target_class, int length)
 {
 	int segment_size = length / 10;
@@ -91,7 +92,7 @@ array2D rand_array2D(int col, int row, double minimum, double maximum)
 	{
 		for (j = 0; j < array[0].size(); j++)
 		{
-			array[i][j] = minimum + maximum * rand() / RAND_MAX;
+			array[i][j] = minimum + (maximum - minimum) * rand() / RAND_MAX;
 		}
 	}
 

@@ -18,10 +18,12 @@ public:
 
 	Array2D(int col, int row, T value);
 
+	// from image 64FC1
+	Array2D(const Mat &img);
+
 	// *************************** 输入 ***************************************** //
 
 	void from_image_64FC1(const Mat &img);
-
 
 	// *************************** 赋值 ***************************************** //
 
@@ -48,20 +50,31 @@ public:
 	// 归一化为0~1
 	void normalize();
 
+	// 重置为指定范围和大小的随机数
+	void set_rand(int col, int row, double minimum, double maximum);
+
+	Array2D<T> sampling(const int &sample_interval) const;
+
 	// 用于卷积核的翻转
 	void flip_xy();
 
-	Mat to_Mat_64FC1() const;
+	void class_0_to_9(int length);
 
 	// ************************** 数学运算 **************************************** //
 
 	Array2D<T> operator + (const Array2D<T> &array2D) const;
 
+	Array2D<T> operator + (const T &val) const;
+
 	Array2D<T> operator * (const Array2D<T> &array2D) const;
 
-	T sum() const;
+	Array2D<T> operator * (const T &val) const;
+
+	void add(const Array2D<T> &array2D);
 
 	void dot_product(const Array2D<T> &array2D);
+
+	T sum() const;
 
 	// *************************** 输出 ***************************************** //
 
@@ -72,6 +85,8 @@ public:
 	void show_image_64FC1() const;
 
 	void show_image_64FC1(int time_msec) const;
+
+	Mat to_Mat_64FC1() const;
 
 private:
 

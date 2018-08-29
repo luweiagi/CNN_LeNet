@@ -8,21 +8,11 @@
 
 void test()
 {
-	Mat train_x1 = imread("file/2.bmp", 0);//读取灰度图
-										   // normalize 归一化， 由0~255的uchar类型变为0~1的double类型
-	train_x1.convertTo(train_x1, CV_64FC1, 1 / 255.0);//其中dst为目标图， CV_32FC3为要转化的类型
+	Array2Dd aaa(4, 3, 0.8);
 
-	Array2Dd xxx, yyy;
+	Array2Dd bbb = aaa * 2 + 0.4;
 
-	xxx.create(3, 2, 2);
-	yyy.create(3, 2, 2.2);
-
-	Array3Dd zzz;
-	zzz.push_back(xxx);
-	zzz.push_back(yyy);
-
-	zzz.at(0).print();
-	zzz.at(1).print();
+	bbb.print();
 
 	return;
 }
@@ -30,9 +20,9 @@ void test()
 
 int main()
 {
-	test();
+	//test();
 
-	/*
+	//*
 
 	// ****************************** 创建训练集 ***************************************************** //
 
@@ -44,25 +34,26 @@ int main()
 	read_batch_images(file_addr, "bmp", 1, 1000, train_x_Mat);
 	// 转为灰度图
 	images_convert_to_64FC1(train_x_Mat);
-	// 由Mat图片格式转为CNN的array2D格式
-	vector<array2D> train_x = vector_image_64FC1_to_vector_array2D(train_x_Mat);
+
+	// 由Mat图片格式转为CNN所用的Array3Dd格式
+	Array3Dd train_x(train_x_Mat);
 	// 归一化
-	normalize_vector_array2D_from_0_to_1(train_x);
+	train_x.normalize();
 	// 显示所读取的图片，即将要喂给CNN的训练数据
-	vector_array2D_show_one_window("Multiple Images", train_x, CvSize(26, 18), CvSize(32, 32), 700);
+	train_x.show_specified_images_64FC1("Multiple Images", CvSize(26, 18), CvSize(32, 32), 1000);
 
 	// 加载训练集的样本标签
-	vector<vector<double>> train_y;
-	set_target_class_one2ten(train_y,1000);
-	show_vector_vector_double_as_image_64FC1(train_y, 700);
+	Array2Dd train_y;
+	train_y.class_0_to_9(1000);
+	train_y.show_image_64FC1(700);
 
 	// ****************************** 创建测试集 ***************************************************** //
 
 	// 创建测试集的样本图片
-	vector<array2D> test_x = train_x;
+	Array3Dd test_x = train_x;
 
 	// 创建测试集的样本标签
-	vector<vector<double>> test_y = train_y;
+	Array2Dd test_y = train_y;
 
 	// ****************************** 初始化CNN ****************************************************** //
 
@@ -126,7 +117,7 @@ int main()
 	cout << "error rate is ： " << error_rate * 100 << "%" << endl;
 
 	// 绘制出均方误差历史曲线
-	show_curve_image(get_vector_double_n2m(0, LeNet.get_epochs()-1), LeNet.get_ERR(), 25, 1000);
+	show_curve_image(get_vector_n2m(0, LeNet.get_epochs()-1), LeNet.get_ERR(), 25, 1000);
 
 	//*/
 	return 0;

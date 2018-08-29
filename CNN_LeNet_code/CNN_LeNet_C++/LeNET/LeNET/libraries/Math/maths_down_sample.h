@@ -2,6 +2,7 @@
 #include <vector>
 #include <vector_array.h>
 #include <iostream>
+#include <Array.h>
 
 using namespace std;
 
@@ -15,11 +16,11 @@ typedef enum
 	StochasticPooling
 }down_sample_type;
 
-vector<array2D> down_sample(const vector<array2D> &vector_array, const int sample_num, down_sample_type sample_type);
+Array3Dd down_sample(const Array3Dd &vector_array, const int sample_num, down_sample_type sample_type);
 
-vector<array2D> down_sample_mean_pooling(const vector<array2D> &vector_array, const int sample_num);
+Array3Dd down_sample_mean_pooling(const Array3Dd &vector_array, const int sample_num);
 
-vector<array2D> down_sample_max_pooling(const vector<array2D> &vector_array, const int sample_num);
+Array3Dd down_sample_max_pooling(const Array3Dd &vector_array, const int sample_num);
 
-vector<array2D> down_sample_stochastic_pooling(const vector<array2D> &vector_array, const int sample_num);
+Array3Dd down_sample_stochastic_pooling(const Array3Dd &vector_array, const int sample_num);
 
