@@ -2,6 +2,7 @@
 #include <float.h>
 #include <algorithm>
 #include <time.h>
+#include <maths.h>
 
 template <typename T>
 Array2D<T>::Array2D<T>(int col, int row, T value)
@@ -212,6 +213,13 @@ void Array2D<T>::set_zero_same_size_as(const Array2D<T> &array2D)
 
 
 template <typename T>
+void Array2D<T>::clear()
+{
+	_array2D.clear();
+}
+
+
+template <typename T>
 void Array2D<T>::normalize()
 {
 	// find min and max;
@@ -312,6 +320,60 @@ Array2D<T> Array2D<T>::sampling(const int &sample_interval) const
 	}
 
 	return sampled_array2D;
+}
+
+
+// 将2D变成一维向量，按照matlab的做法，是按照列的，例如
+// a = [1, 2, 3;
+//	    4, 5, 6];
+// reshape(a, 6, 1) = [1 4 2 5 3 6]'
+template <typename T>
+vector<T> Array2D<T>::reshape_to_vector() const
+{
+	vector<T> reshape_vector;
+
+	int col = _array2D.size();
+	int row = _array2D.at(0).size();
+
+	if (col == 0 || row == 0)
+	{
+		cout << "Array2D is empty!" << endl << "Array2D.reshape_to_vector() failed!" << endl;
+		return reshape_vector;
+	}
+
+	for (int i = 0; i < col; i++)
+	{
+		for (int j = 0; j < row; j++)
+		{
+			reshape_vector.push_back(_array2D.at(i).at(j));
+		}
+	}
+
+	return reshape_vector;
+}
+
+
+template <typename T>
+void Array2D<T>::append_along_row(const Array2D<T> &array2D)
+{
+	int col = _array2D.size();
+	int new_col = array2D.size();
+	if (col == 0)
+	{
+		_array2D.resize(new_col);
+	}
+	else if (col != new_col)
+	{
+		cout << "size not same!" << endl << "Array2D.append_along_row() failed!" << endl;
+		return;
+	}
+
+	for (int i = 0; i < new_col; i++)
+	{
+		vector<T> & v1 = _array2D.at(i);
+		const vector<T> & v2 = array2D.at(i);
+		v1.insert(v1.end(), v2.begin(), v2.end());
+	}
 }
 
 
@@ -525,6 +587,83 @@ void Array2D<T>::dot_product(const Array2D<T> &array2D)
 
 
 template <typename T>
+Array2D<T> Array2D<T>::product(const Array2D<T> &array2D) const
+{
+	int col_A = _array2D.size();
+	int row_A = _array2D.at(0).size();
+
+	int col_B = array2D.size();
+	int row_B = array2D.at(0).size();
+
+	if (col_A != row_B)
+	{
+		cout << "size not match!" << endl << "Array2D.product() failed!" << endl;
+		Array2D<T> temp;
+		return temp;
+	}
+
+	if (col_A == 0 || row_A == 0 || col_B == 0 || row_B == 0)
+	{
+		cout << "Array2D A or B is empty!" << endl << "Array2D.product() failed!" << endl;
+		Array2D<T> temp;
+		return temp;
+	}
+
+	T *arr_A = new T[row_A * col_A]();
+	T *arr_B = new T[row_B * col_B]();
+
+	Array2Dd AB(col_B, row_A, 0);
+
+	int col_max = col_A > col_B ? col_A : col_B;
+	int row_max = row_A > row_B ? row_A : row_B;
+
+	int i, j, k;
+
+	// 给A和B矩阵赋值
+	for (i = 0; i < row_max; i++)
+	{
+		for (j = 0; j < col_max; j++)
+		{
+			// 给A矩阵赋值
+			if ((i < row_A) && (j < col_A))
+			{
+				arr_A[i * col_A + j] = _array2D.at(j).at(i);
+			}
+
+			// 给B矩阵赋值
+			if ((i < row_B) && (j < col_B))
+			{
+				arr_B[i * col_B + j] = array2D.at(j).at(i);
+			}
+		}
+	}
+
+	// AB = A * B
+	T val_ij = 0;
+	for (i = 0; i < row_A; i++)
+	{
+		for (j = 0; j < col_B; j++)
+		{
+			// arr_A[i * col_A + j]
+			for (k = 0; k < col_A; k++)
+			{
+				T a1 = arr_A[i * col_A + k];
+				T b1 = arr_B[k * row_B + j];
+				val_ij += arr_A[i * col_A + k] * arr_B[k * col_B + j];
+			}
+			AB.at(j).at(i) = val_ij;
+			val_ij = 0;
+		}
+	}
+
+	delete[] arr_A;
+	delete[] arr_B;
+
+	return AB;
+}
+
+
+template <typename T>
 T Array2D<T>::sum() const
 {
 	int col = _array2D.size();
@@ -643,9 +782,12 @@ template void Array2D<double>::get_specific_patch(const Array2D<double> &array2D
 template void Array2D<double>::set_zero();
 template void Array2D<double>::set_value(double val);
 template void Array2D<double>::set_zero_same_size_as(const Array2D<double> &array2D);
+template void Array2D<double>::clear();
 template void Array2D<double>::normalize();
 template void Array2D<double>::set_rand(int col, int row, double minimum, double maximum);
 template Array2D<double> Array2D<double>::sampling(const int &sample_interval) const;
+template vector<double> Array2D<double>::reshape_to_vector() const;
+template void Array2D<double>::append_along_row(const Array2D<double> &array2D);
 template void Array2D<double>::flip_xy();
 template void Array2D<double>::class_0_to_9(int length);
 template Array2D<double> Array2D<double>::operator + (const Array2D<double> &array2D) const;
@@ -654,6 +796,7 @@ template Array2D<double> Array2D<double>::operator * (const Array2D<double> &arr
 template Array2D<double> Array2D<double>::operator * (const double &val) const;
 template void Array2D<double>::add(const Array2D<double> &array2D);
 template void Array2D<double>::dot_product(const Array2D<double> &array2D);
+template Array2D<double> Array2D<double>::product(const Array2D<double> &array2D) const;
 template double Array2D<double>::sum() const;
 template int Array2D<double>::size() const;
 template void Array2D<double>::print() const;

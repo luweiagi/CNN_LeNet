@@ -47,6 +47,8 @@ public:
 
 	void set_zero_same_size_as(const Array2D<T> &array2D);
 
+	void clear();
+
 	// 归一化为0~1
 	void normalize();
 
@@ -54,6 +56,10 @@ public:
 	void set_rand(int col, int row, double minimum, double maximum);
 
 	Array2D<T> sampling(const int &sample_interval) const;
+
+	vector<T> reshape_to_vector() const;
+
+	void append_along_row(const Array2D<T> &array2D);
 
 	// 用于卷积核的翻转
 	void flip_xy();
@@ -73,6 +79,8 @@ public:
 	void add(const Array2D<T> &array2D);
 
 	void dot_product(const Array2D<T> &array2D);
+
+	Array2D<T> product(const Array2D<T> &array2D) const;
 
 	T sum() const;
 

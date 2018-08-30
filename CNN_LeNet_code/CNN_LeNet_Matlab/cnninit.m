@@ -63,7 +63,7 @@ for L = 2 : n                                                   % ¶ÔCNNÍøÂç²ãÊı×
         if (strcmp(net.layers{L-1}.type, 's') || strcmp(net.layers{L-1}.type, 'c') || strcmp(net.layers{L-1}.type, 'i'))
         %------------------------------------------------------------------
         % ÒÔÏÂ´úÂë¶ÔµÚ6²ã(¹ı¶ÉÈ«Á¬½Ó²ã)ÓĞĞ§            
-            
+
             fvnum = prod(net.layers{L-1}.iSizePic) * net.layers{L-1}.iChannel;          % Ã¿¸öÍ¨µÀµÄÏñËØ¸öÊı * ÊäÈëÍ¨µÀÊı = ÏÂÒ»²ãÈ«Á¬½ÓÊäÈë¸öÊı
             onum = net.layers{L}.iChannel;                                              % Êä³ö²ãÀà±ğ¸öÊı
             

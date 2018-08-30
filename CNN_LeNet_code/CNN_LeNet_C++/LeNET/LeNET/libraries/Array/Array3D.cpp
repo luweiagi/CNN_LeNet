@@ -173,6 +173,31 @@ Array3D<T> Array3D<T>::sampling(const int &sample_interval) const
 }
 
 
+// 将3D的最后两个D变成一维向量，按照matlab的做法，是按照列的，例如
+// a = [1, 2, 3;
+//	    4, 5, 6];
+// reshape(a, 6, 1) = [1 4 2 5 3 6]'
+template <typename T>
+Array2D<T> Array3D<T>::reshape_to_Array2D() const
+{
+	int page = _array3D.size();
+	Array2D<T> reshape_2D;
+
+	if (page == 0)
+	{
+		cout << "Array3D is empty!" << endl << "Array3D.reshape_to_Array2D() failed!" << endl;
+		return reshape_2D;
+	}
+
+	for (int i = 0; i < page; i++)
+	{
+		reshape_2D.push_back(_array3D.at(i).reshape_to_vector());
+	}
+
+	return reshape_2D;
+}
+
+
 template <typename T>
 Array3D<T> Array3D<T>::operator + (const T &val) const
 {
@@ -323,6 +348,7 @@ template void Array3D<double>::set_value(double val);
 template void Array3D<double>::set_zero_same_size_as(const Array3D<double> &array3D);
 template void Array3D<double>::normalize();
 template Array3D<double> Array3D<double>::sampling(const int &sample_interval) const;
+template Array2D<double> Array3D<double>::reshape_to_Array2D() const;
 template Array3D<double> Array3D<double>::operator + (const double &val) const;
 template Array3D<double> Array3D<double>::operator * (const double &val) const;
 template void Array3D<double>::add(const Array3D<double> &array3D);

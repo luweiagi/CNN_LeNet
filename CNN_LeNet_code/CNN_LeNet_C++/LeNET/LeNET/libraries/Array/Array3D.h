@@ -41,6 +41,8 @@ public:
 
 	Array3D<T> sampling(const int &sample_interval) const;
 
+	Array2D<T> reshape_to_Array2D() const;
+
 	// ************************** ÊıÑ§ÔËËã **************************************** //
 
 	Array3D<T> operator + (const T &val) const;

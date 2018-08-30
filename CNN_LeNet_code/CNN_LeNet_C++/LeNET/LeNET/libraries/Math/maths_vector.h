@@ -66,6 +66,7 @@ void print_vector(const vector<T> &vector_variable)
 {
 	for (vector<T>::const_iterator it = vector_variable.begin(); it != vector_variable.end(); it++)
 	{
-		cout << *it << endl;;
+		cout << *it << " ";
 	}
+	cout << endl;
 }

@@ -25,3 +25,4 @@ void randperm_array(int serial_num[], int num)
 		serial_num[j] = temp;
 	}
 }
+

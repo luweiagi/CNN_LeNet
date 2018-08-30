@@ -8,11 +8,18 @@
 
 void test()
 {
-	Array2Dd aaa(4, 3, 0.8);
+	Array2Dd aaa(3, 2, 1);
+	aaa.at(2).at(1) = 2;
+	Array2Dd bbb(2, 3, 1);
+	bbb.at(1).at(2) = 2;
+	Array2Dd ccc;
 
-	Array2Dd bbb = aaa * 2 + 0.4;
-
+	aaa.print();
 	bbb.print();
+
+	ccc = aaa.product(bbb);
+	ccc.print();
+
 
 	return;
 }
@@ -20,9 +27,9 @@ void test()
 
 int main()
 {
-	//test();
+	test();
 
-	//*
+	/*
 
 	// ****************************** ´´½¨ÑµÁ·¼¯ ***************************************************** //
 

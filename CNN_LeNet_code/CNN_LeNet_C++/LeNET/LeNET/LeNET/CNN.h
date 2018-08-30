@@ -59,9 +59,12 @@ typedef struct{
 	vector<double> Beta_delta;// 只针对下采样层，其它层此参数无意义
 
 	// 下采样的输入
-	vector<Array3Dd> X_down;// 注意是_batchsize幅输入输出同时处理，所以不是2D，而是3D，维度为[_batchsize, iSizePic[0], iSizePic[1]]
-								   // 只针对下采样层，其它层此参数无意义
+	vector<Array3Dd> X_down;// 注意是_batchsize幅输入输出同时处理，所以不是2D，而是3D，维度为[_batchsize, iChannel*iSizePic[0]*iSizePic[1]]
+							// 只针对下采样层，其它层此参数无意义
 
+	// 将当前层所有的输出图组合成一个向量
+	Array2Dd X_Array;// 注意是_batchsize幅输入输出同时处理，所以不是一维向量，而是2D，维度为[_batchsize, iChannel*iSizePic[0]*iSizePic[1]]
+					 // 只针对下一层为全连接层的非全连接层，比如LeNet的倒数第四层。其它层此参数无意义
 } Layer;
 
 
@@ -126,4 +129,7 @@ private:
 
 	// 当前轮的当前批次的均方误差
 	double _err;
+
+	// 神经网络的输出，就是最后一层网络的输出图
+	vector<Array3Dd> _Y;// 注意是_batchsize幅输入输出同时处理，所以不是2D，而是3D，维度为[_batchsize, iSizePic[0], iSizePic[1]]
 };

@@ -71,8 +71,8 @@ void CNN::train(const Array3Dd &train_x, const Array2Dd &train_y)
 				batch_train_y.push_back(train_y.at(kk.at(i)));
 			}
 			// 显示当前正在处理的批量图片（只显示10张，当批处理图片的数量小于10时会报错，这时需要修改显示的张数）
-			string window_title = "Images from " + to_string(L*_batchsize) + " to " + to_string(min((L + 1)*_batchsize, m));
-			batch_train_x.show_specified_images_64FC1(window_title, CvSize(5, 2), CvSize(32, 32), 150);
+			//string window_title = "Images from " + to_string(L*_batchsize) + " to " + to_string(min((L + 1)*_batchsize, m));
+			//batch_train_x.show_specified_images_64FC1(window_title, CvSize(5, 2), CvSize(32, 32), 150);
 
 			// 在当前的网络权值和网络输入下计算网络的输出(正向计算)
 			clock_t tic_ff = clock();
@@ -95,7 +95,7 @@ void CNN::train(const Array3Dd &train_x, const Array2Dd &train_y)
 		// ********************************************************************************************* //
 
 		clock_t toc = clock(); //获取毫秒级数目
-		cout << "epochs " << I+1 << "time has elapsed: " << (double)(toc - tic) / 1000 << " seconds" << endl;
+		cout << "epochs " << I+1 << " time has elapsed: " << (double)(toc - tic) / 1000 << " seconds" << endl;
 	}
 	//*/
 	cout << "train has finished!" << endl;
@@ -203,7 +203,7 @@ void CNN::init()
 
 				double maximum = (double)sqrt(6.0f / (onum + fvnum));
 				// 初始化当前层与上一层的连接权值
-				_layers.at(L).W.set_rand(fvnum, onum, -maximum, maximum);// 注意是W[I][J],I为当前层全连接输入个数，J为当前层数目
+				_layers.at(L).W.set_rand(fvnum, onum, -maximum, maximum);// 注意是W[I列][J行],I为当前层全连接输入个数，J为当前层数目
 				_layers.at(L).W_delta.set_zero_same_size_as(_layers.at(L).W);
 
 				// 对本层输出通道加性偏置进行0值初始化
@@ -283,8 +283,6 @@ void CNN::feed_forward(const Array3Dd &train_x)
 						z.add(convolution_n_dim(_layers.at(L - 1).X.at(I), _layers.at(L).Ker.at(I).at(J)));
 					}
 				}
-				//_layers.at(L).Ker.at(0).at(J).print();
-				//cout << "L = " << L + 1 << endl;
 
 				// 2.偏置(加)
 				_layers.at(L).X.at(J) = z + _layers.at(L).B.at(J);
@@ -326,11 +324,42 @@ void CNN::feed_forward(const Array3Dd &train_x)
 
 		if (_layers.at(L).type == 'f')
 		{
+			if ((_layers.at(L - 1).type == 's') || (_layers.at(L - 1).type == 'c') || (_layers.at(L - 1).type == 'i'))
+			{
+				// ------------------------------------------------------------------
+				// 以下代码对第6层(过渡全连接层)有效
 
+				_layers.at(L - 1).X_Array.clear();
+
+				// 对前一层输出通道数做循环
+				// 计算用于本层输入的一维向量（前一层的所有通道输出图合并为一个一维向量，以便计算）
+				for (int J = 0; J < _layers.at(L - 1).iChannel; J++)
+				{
+					// 第j个特征map的大小(实际上每个j都相等)
+					int sa_page = _layers.at(L - 1).X.at(J).size();
+					int sa_col = _layers.at(L - 1).X.at(J).at(0).size();
+					int sa_row = _layers.at(L - 1).X.at(J).at(0).at(0).size();
+
+					// 将所有的特征map拉成一条列向量。还有一维就是对应的样本索引。每个样本一列，每列为对应的特征向量，此处非常巧妙！
+					// 会将每幅图像的按照列向量的形式抽取为1行，然后再将不同样本的列向量串联起来
+
+					_layers.at(L - 1).X_Array.append_along_row( _layers.at(L - 1).X.at(J).reshape_to_Array2D() );
+				}
+
+				// 计算网络的最终输出值。sigmoid(W*X + b)，注意是同时计算了batchsize个样本的输出值
+
+
+			}
+			else if (_layers.at(L - 1).type == 'f')
+			{
+				// ------------------------------------------------------------------
+				// 以下代码对第7,8层(全连接层)有效
+
+			}
 		}
 	}
 
-	//net.y=
+	// _Y=
 	//*/
 }
 

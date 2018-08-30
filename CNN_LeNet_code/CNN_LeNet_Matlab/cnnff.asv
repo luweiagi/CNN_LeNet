@@ -75,17 +75,12 @@ for L = 2 : n                                                   % ¶ÔCNNÍøÂç²ãÊı×
                 % ½«ËùÓĞµÄÌØÕ÷mapÀ­³ÉÒ»ÌõÁĞÏòÁ¿¡£»¹ÓĞÒ»Î¬¾ÍÊÇ¶ÔÓ¦µÄÑù±¾Ë÷Òı¡£Ã¿¸öÑù±¾Ò»ÁĞ£¬Ã¿ÁĞÎª¶ÔÓ¦µÄÌØÕ÷ÏòÁ¿£¬´Ë´¦·Ç³£ÇÉÃî£¡
                 % »á½«Ã¿·ùÍ¼ÏñµÄ°´ÕÕÁĞÏòÁ¿µÄĞÎÊ½³éÈ¡Îª1ĞĞ£¬È»ºóÔÙ½«²»Í¬Ñù±¾µÄÁĞÏòÁ¿´®ÁªÆğÀ´
                 net.layers{L-1}.X_Array = [net.layers{L-1}.X_Array; reshape(net.layers{L-1}.X{J}, sa(1) * sa(2), sa(3))];
-                % size(net.layers{L-1}.X{J}) = [5 5 10]
-                % size(net.layers{L-1}.X_Array) = [25+25+25+25 10]
+                % size(net.layers{L-1}.X_Array) = [25 10]
             end
             
             % ¼ÆËãÍøÂçµÄ×îÖÕÊä³öÖµ¡£sigmoid(W*X + b)£¬×¢ÒâÊÇÍ¬Ê±¼ÆËãÁËbatchsize¸öÑù±¾µÄÊä³öÖµ
             net.layers{L}.X = fx(net.layers{L}.W * net.layers{L-1}.X_Array + repmat(net.layers{L}.B, 1, size(net.layers{L-1}.X_Array, 2)));
-            %size(net.layers{L}.X) = [120 10]
-            %size(net.layers{L}.W) = [120 100]
-            %size(net.layers{L-1}.X_Array) = [100 10]
-            %size(net.layers{L}.B) = [120 1]
-            %size(repmat(net.layers{L}.B, 1, size(net.layers{L-1}.X_Array, 2))) = [120 10]
+            
             % ÌØ±ğ×¢Òâ:
             % Êä³ö²ãÉæ¼°µ½Èı¸öÔËËã:(1)¼ÓÈ¨,(2)Æ«ÖÃ(¼Ó),(3)sigmoidÓ³Éä
             
