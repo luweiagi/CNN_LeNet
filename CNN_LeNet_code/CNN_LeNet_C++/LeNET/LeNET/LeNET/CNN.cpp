@@ -80,8 +80,11 @@ void CNN::train(const Array3Dd &train_x, const Array2Dd &train_y)
 			clock_t toc_ff = clock();
 			cout << "                          batches " << L+1 << " feedforward time has elapsed: " << (double)(toc_ff - tic_ff) / 1000 << " seconds" << endl;
 		
-			// 得到上面的网络输出后，通过对应的样本标签用bp算法来得到误差对网络权值(反向传播) 的导数？
+			// 得到上面的网络输出后，通过对应的样本标签用bp算法来得到误差对网络权值(反向传播) 的导数
+			clock_t tic_bp = clock();
 			back_propagation(batch_train_y);
+			clock_t toc_bp = clock();
+			cout << "                          batches " << L + 1 << " back propagation time has elapsed: " << (double)(toc_bp - tic_bp) / 1000 << " seconds" << endl;
 
 			// 得到误差对权值的导数后，就通过权值更新方法去更新权值
 			update();
@@ -222,7 +225,7 @@ void CNN::init()
 
 				double maximum = (double)sqrt(6.0f / (onum + fvnum));
 				// 初始化当前层与上一层的连接权值
-				_layers.at(L).W.set_rand(fvnum, onum, -maximum, maximum);// 注意是W[I][J],I为上一层的数目，J为当前层数目
+				_layers.at(L).W.set_rand(fvnum, onum, -maximum, maximum);// 注意是W[列I][行J],I为上一层的数目，J为当前层数目
 				_layers.at(L).W_delta.set_zero_same_size_as(_layers.at(L).W);
 
 				// 对本层输出通道加性偏置进行0值初始化
@@ -329,6 +332,9 @@ void CNN::feed_forward(const Array3Dd &train_x)
 				// ------------------------------------------------------------------
 				// 以下代码对第6层(过渡全连接层)有效
 
+				// 特别注意:
+				// 全连接输出层涉及到三个运算 : (1)加权, (2)偏置(加), (3)sigmoid映射
+
 				_layers.at(L - 1).X_Array.clear();
 
 				// 对前一层输出通道数做循环
@@ -342,32 +348,196 @@ void CNN::feed_forward(const Array3Dd &train_x)
 
 					// 将所有的特征map拉成一条列向量。还有一维就是对应的样本索引。每个样本一列，每列为对应的特征向量，此处非常巧妙！
 					// 会将每幅图像的按照列向量的形式抽取为1行，然后再将不同样本的列向量串联起来
-
 					_layers.at(L - 1).X_Array.append_along_row( _layers.at(L - 1).X.at(J).reshape_to_Array2D() );
 				}
 
 				// 计算网络的最终输出值。sigmoid(W*X + b)，注意是同时计算了batchsize个样本的输出值
 
+				int col_batchsize = _layers.at(L - 1).X_Array.size();
+				// in = W*X + B (1)加权, (2)偏置(加)
+				Array2Dd fcl_map_in = _layers.at(L).W.product(_layers.at(L - 1).X_Array) + Array2Dd::repmat(_layers.at(L).B, 1, col_batchsize);
+				// out = activ(in) (3)sigmoid映射
+				_layers.at(L).X_fcl = activation_function(fcl_map_in, _activation_func_type);
 
+				// 特别注意:
+				// 全连接输出层涉及到三个运算 : (1)加权, (2)偏置(加), (3)sigmoid映射
 			}
 			else if (_layers.at(L - 1).type == 'f')
 			{
 				// ------------------------------------------------------------------
 				// 以下代码对第7,8层(全连接层)有效
 
+				// 特别注意:
+				// 全连接输出层涉及到三个运算 : (1)加权, (2)偏置(加), (3)sigmoid映射
+
+				// 计算网络的最终输出值。sigmoid(W*X + b)，注意是同时计算了batchsize个样本的输出值
+
+				int col_batchsize = _layers.at(L - 1).X_fcl.size();
+				// in = W*X + B (1)加权, (2)偏置(加)
+				Array2Dd fcl_map_in = _layers.at(L).W.product(_layers.at(L - 1).X_fcl) + Array2Dd::repmat(_layers.at(L).B, 1, col_batchsize);
+				// out = activ(in) (3)sigmoid映射
+				_layers.at(L).X_fcl = activation_function(fcl_map_in, _activation_func_type);
+
+				// 特别注意:
+				// 全连接输出层涉及到三个运算 : (1)加权, (2)偏置(加), (3)sigmoid映射
 			}
 		}
 	}
 
-	// _Y=
-	//*/
+	// 将最后一层（全连接层）的输出结果喂给_Y，作为神经网络的输出
+	_Y = _layers.at(n-1).X_fcl;
 }
 
 
 // CNN网络,反向传播(批处理算法)
 void CNN::back_propagation(const Array2Dd &train_y)
 {
-	;
+	// CNN网络层数
+	int n = _layers.size();
+
+	// 输出误差: 预测值-期望值
+	Array2Dd E = _layers.at(n - 1).X_fcl - train_y;
+
+	// 输出层灵敏度(残差)
+	// 注意，这里需要说明下，这里对应的公式是 delta = (y - t).*f'(u),但是这里为什么是f'(x)呢？
+	// 因为这里其实是sigmoid求导，f'(u) = x*(1-x)，所以输入的就是x了。
+	// 其中，u表示当前层输入，x表示当前层输出。
+	_layers.at(n - 1).Delta_fcl = E * derivation(_layers.at(n - 1).X_fcl, _activation_func_type);
+
+	// 代价函数是均方误差,已对样本数做平均
+	_err = 0.5 * E.pow(2).sum() / E.size();// 当前轮的当前批次的均方误差
+
+	// ************** 灵敏度(残差)的反向传播 ******************************
+
+	int tmp;
+	if (_layers.at(1).type == 'f')
+	{
+		// 当第二层就是全连接层时,相当于输入图片拉成一个特征矢量形成的BP网络,
+		// 考虑到必须计算net.layers{1}.X_Array,所以L的下限必须到0
+		tmp = 0;
+	}
+	else
+	{
+		// 其它情况L下限是1就可以
+		tmp = 1;
+	}
+
+	for (int L = (n - 2); L >= tmp; L--)
+	{
+		// =====================================================================
+		// 以下代码对“下一层”为“全连接层”时有效
+
+		if (_layers.at(L + 1).type == 'f')
+		{
+			if (_layers.at(L).type == 'f')
+			// ------------------------------------------------------------------
+			// 以下代码对第6(过渡全连接层),7层(全连接层)有效
+			{
+				// 典型的BP网络输出层对隐层的灵敏度(残差)的反向传播公式
+				_layers.at(L).Delta_fcl = _layers.at(L + 1).W.transpose().product(_layers.at(L + 1).Delta_fcl) * derivation(_layers.at(L).X_fcl, _activation_func_type);
+				// 作为参考，当L=6（倒数第二层）时，上式的维度如下行所示：
+				// _layers.at(L).Delta = [84, 10] [行 列]
+				// _layers.at(L + 1).W = [10, 84]
+				// _layers.at(L + 1).W.transpose() = [84 10]
+				// _layers.at(L + 1).Delta = [10 10]
+				// _layers.at(L).X_fcl = [84 10]
+			}
+			else if (_layers.at(L).type == 's' || _layers.at(L).type == 'c' || _layers.at(L).type == 'i')
+			// ------------------------------------------------------------------
+			// 以下代码对第5层(降采样层)有效，其“下一层”为过渡全连接层
+			{
+				// 每个输出通道图像尺寸(三维矢量,  第三维是批处理样本个数，最后两维是尺寸)
+				int SizePic_0 = _layers.at(L).X.at(0).at(0).size();
+				int SizePic_1 = _layers.at(L).X.at(0).at(0).at(0).size();
+
+				// 输出图像像素个数
+				int fvnum = SizePic_0 * SizePic_1;                                  
+
+				// 典型的BP网络输出层对隐层的灵敏度(残差)的反向传播公式
+
+				// 若当前层是降采样层，或输入层
+				int col1 = _layers.at(L + 1).W.size();
+				int row1 = _layers.at(L + 1).W.at(0).size();
+
+				int col2 = _layers.at(L + 1).Delta_fcl.size();
+				int row2 = _layers.at(L + 1).Delta_fcl.at(0).size();
+
+				_layers.at(L).Delta_Array = _layers.at(L + 1).W.transpose().product(_layers.at(L + 1).Delta_fcl);
+				// 作为参考，当L=4（第二个降采样层，下一层为全连接层）时，上式的维度如下行所示：
+				// _layers.at(L).Delta_Array = [100 10]
+				// _layers.at(L + 1).W = [120 100]
+				// _layers.at(L + 1).W.transpose() = [100 120]
+				// _layers.at(L + 1).Delta = [120 10]
+
+				// 若当前层是卷积层
+				if (_layers.at(L).type == 'c')
+				{
+					// 由于卷积层存在激活函数，则还需要点乘当前层激活函数的导数，才是当前层的灵敏度
+					_layers.at(L).Delta_Array.dot_product(derivation(_layers.at(L).X_Array, _activation_func_type));
+				}
+
+				for (int J = 0; J < _layers.at(L).iChannel; J++)
+				{
+					// 此处也是批处理的
+					// 将本层的长矢量灵敏度(残差), 每一列为一个样本, reshape成通道表示(矢量化全连接->通道化全连接)
+				}
+			}
+		}
+
+		// =====================================================================
+		// 以下代码对“下一层”为“下采样层”时有效
+
+		if (_layers.at(L + 1).type == 's')
+		{
+
+		}
+
+		// =====================================================================
+		// 以下代码对“下一层”为“卷积层”时有效
+
+		if (_layers.at(L + 1).type == 'c')
+		{
+
+		}
+
+		// =====================================================================
+	}
+
+	// ****************** 求训练参数的梯度 **************************************
+
+	// 这里与《Notes on Convolutional Neural Networks》中不同，
+	// 这里的“子采样”层没有参数，也没有激活函数，
+	// 所以在子采样层是没有需要求解的参数的
+
+	// 对CNN网络层数做循环(注意:这里实际上可以从第2层开始)
+	for (int L = 1; L < n; L++)
+	{
+		// =====================================================================
+		// 以下代码用于第2,4层(卷积层)的计算
+
+		if (_layers.at(L).type == 'c')
+		{
+
+		}
+
+		// =====================================================================
+		// 以下代码用于第3,5层(下采样层)的计算
+
+		if (_layers.at(L).type == 's')
+		{
+
+		}
+
+		// =====================================================================
+		// 以下代码用于第6,7,8层(全连接层)的计算
+
+		if (_layers.at(L).type == 'f')
+		{
+
+		}
+
+		// =====================================================================
+	}
 }
 
 

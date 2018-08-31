@@ -5,6 +5,7 @@
 #include <opencv2/imgproc/imgproc.hpp>  
 #include <opencv2/core/core.hpp>  
 
+
 using namespace std;
 using namespace cv;
 
@@ -61,6 +62,39 @@ public:
 
 	void append_along_row(const Array2D<T> &array2D);
 
+	// 这里将一维的vector看作是列向量，和matlab函数repmat一致
+	static Array2D<T> repmat(const vector<T> &vec, int row, int col)// 静态成员函数
+	{
+		if (row <= 0 || col <= 0 || vec.size() <= 0)
+		{
+			cout << "size is zero!" << endl << "Array2D.repmat() failed!" << endl;
+			Array2D<T> temp;
+			return temp;
+		}
+
+		vector<T> vec_row;
+		Array2D<T> array2D;
+
+		int i;
+		for (i = 0; i < row; i++)
+		{
+			vec_row.insert(vec_row.end(), vec.begin(), vec.end());
+		}
+
+		for (i = 0; i < col; i++)
+		{
+			array2D.push_back(vec_row);
+		}
+
+		return array2D;
+	}
+
+	// 将Array2D的row转成Array3D的col和row，Array2D的col转为Array3D的page
+	//Array3D<T> reshape(int col, int row) const;
+
+	// 矩阵转置
+	Array2D<T> transpose() const;
+
 	// 用于卷积核的翻转
 	void flip_xy();
 
@@ -72,6 +106,9 @@ public:
 
 	Array2D<T> operator + (const T &val) const;
 
+	Array2D<T> operator - (const Array2D<T> &array2D) const;
+
+	// 点乘
 	Array2D<T> operator * (const Array2D<T> &array2D) const;
 
 	Array2D<T> operator * (const T &val) const;
@@ -80,9 +117,12 @@ public:
 
 	void dot_product(const Array2D<T> &array2D);
 
+	// 矩阵乘法
 	Array2D<T> product(const Array2D<T> &array2D) const;
 
 	T sum() const;
+
+	Array2D<T> pow(const int power_num) const;
 
 	// *************************** 输出 ***************************************** //
 

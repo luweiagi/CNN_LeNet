@@ -376,6 +376,82 @@ void Array2D<T>::append_along_row(const Array2D<T> &array2D)
 	}
 }
 
+/*
+template <typename T>
+Array3D<T> Array2D<T>::reshape(int col, int row) const
+{
+	int page = _array2D.size();
+	if(page <= 0)
+	{
+		cout << Array2D is empty!" << endl << "Array2D.reshape() failed!" << endl;
+		Array3D<T> temp;
+		return temp;
+	}
+
+	int line_size = _array2D.at(0).size();
+	if (line_size != col * row)
+	{
+		cout << "size not match!" << endl << "Array2D.reshape() failed!" << endl;
+		Array3D<T> temp;
+		return temp;
+	}
+
+	Array3D<T> vec_arr2D;
+	Array2D<T> arr2D;
+
+	int segment_num = line_size / row;
+	for (int i = 0; i < page, i++)
+	{
+		for (int j = 0; j < segment_num; j++)
+		{
+			vector<T> vec_segment(_array2D.at(i).begin() + j * segment_num, _array2D.at(i).begin() + (j + 1) * segment_num);
+			arr2D.push_back(vec_segment);
+		}
+		vec_arr2D.push_back(arr2D);
+	}
+}
+*/
+
+template <typename T>
+Array2D<T> Array2D<T>::transpose() const
+{
+	int col = _array2D.size();
+	if (col == 0)
+	{
+		cout << "Array2D is empty!" << endl << "Array2D.transpose() failed!" << endl;
+		Array2D<T> temp;
+		return temp;
+	}
+	int row = _array2D.at(0).size();
+
+	T *arr = new T[row * col]();
+
+	int i, j;
+
+	// ¸ø¾ØÕó¸³Öµ
+	for (i = 0; i < row; i++)
+	{
+		for (j = 0; j < col; j++)
+		{
+			// °´ÕÕÐÐÀ´´æ´¢¾ØÕó
+			int index = i * col + j;
+			T val = _array2D.at(j).at(i);
+			arr[i * col + j] = _array2D.at(j).at(i);
+		}
+	}
+
+	Array2D<T> array2D_trans;
+	for (i = 0; i < row; i++)
+	{
+		vector<T> array2D_col(arr + i * col, arr + (i + 1) * col);
+		array2D_trans.push_back(array2D_col);
+	}
+
+	delete[] arr;
+
+	return array2D_trans;
+}
+
 
 template <typename T>
 void Array2D<T>::flip_xy()
@@ -478,6 +554,35 @@ Array2D<T> Array2D<T>::operator + (const T &val) const
 	}
 
 	return add_result;
+}
+
+
+template <typename T>
+Array2D<T> Array2D<T>::operator - (const Array2D<T> &array2D) const
+{
+	int col_A = _array2D.size();
+	int row_A = _array2D.at(0).size();
+	int col_B = array2D.size();
+	int row_B = array2D.at(0).size();
+
+	if (col_A != col_B || row_A != row_B)
+	{
+		cout << "array_A size is not same as arrow_B size!" << endl << "Array2D.operator - failed!" << endl;
+		Array2D<T> temp;
+		return temp;
+	}
+
+	Array2D<T> sub_result(col_A, row_A, 0);
+
+	for (int i = 0; i < col_A; i++)
+	{
+		for (int j = 0; j < row_A; j++)
+		{
+			sub_result.at(i).at(j) = _array2D.at(i).at(j) - array2D.at(i).at(j);
+		}
+	}
+
+	return sub_result;
 }
 
 
@@ -647,8 +752,6 @@ Array2D<T> Array2D<T>::product(const Array2D<T> &array2D) const
 			// arr_A[i * col_A + j]
 			for (k = 0; k < col_A; k++)
 			{
-				T a1 = arr_A[i * col_A + k];
-				T b1 = arr_B[k * row_B + j];
 				val_ij += arr_A[i * col_A + k] * arr_B[k * col_B + j];
 			}
 			AB.at(j).at(i) = val_ij;
@@ -680,6 +783,26 @@ T Array2D<T>::sum() const
 	}
 
 	return sum_ret;
+}
+
+
+template <typename T>
+Array2D<T> Array2D<T>::pow(const int power) const
+{
+	int col = _array2D.size();
+	int row = _array2D.at(0).size();
+
+	Array2D<T> pow_ret(col, row, 0);
+
+	for (int i = 0; i < col; i++)
+	{
+		for (int j = 0; j < row; j++)
+		{
+			pow_ret.at(i).at(j) = std::pow(_array2D.at(i).at(j), power);
+		}
+	}
+
+	return pow_ret;
 }
 
 
@@ -788,16 +911,20 @@ template void Array2D<double>::set_rand(int col, int row, double minimum, double
 template Array2D<double> Array2D<double>::sampling(const int &sample_interval) const;
 template vector<double> Array2D<double>::reshape_to_vector() const;
 template void Array2D<double>::append_along_row(const Array2D<double> &array2D);
+//template Array3D<double> Array2D<double>::reshape(int col, int row) const;
+template Array2D<double> Array2D<double>::transpose() const;
 template void Array2D<double>::flip_xy();
 template void Array2D<double>::class_0_to_9(int length);
 template Array2D<double> Array2D<double>::operator + (const Array2D<double> &array2D) const;
 template Array2D<double> Array2D<double>::operator + (const double &val) const;
+template Array2D<double> Array2D<double>::operator - (const Array2D<double> &array2D) const;
 template Array2D<double> Array2D<double>::operator * (const Array2D<double> &array2D) const;
 template Array2D<double> Array2D<double>::operator * (const double &val) const;
 template void Array2D<double>::add(const Array2D<double> &array2D);
 template void Array2D<double>::dot_product(const Array2D<double> &array2D);
 template Array2D<double> Array2D<double>::product(const Array2D<double> &array2D) const;
 template double Array2D<double>::sum() const;
+template Array2D<double> Array2D<double>::pow(const int power) const;
 template int Array2D<double>::size() const;
 template void Array2D<double>::print() const;
 template void Array2D<double>::show_image_64FC1() const;

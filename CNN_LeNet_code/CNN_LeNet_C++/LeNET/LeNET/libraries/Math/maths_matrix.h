@@ -5,6 +5,8 @@
 
 using namespace cv;
 
+void show_image_64FC1_as_matrix_double(const Mat &img);
+
 // 注意：new方法创建的数组不能使用该函数，因为new创建的数组的内存地址不连续。
 template <typename T>
 void print_matrix(T *array, int row, int col)
@@ -20,4 +22,3 @@ void print_matrix(T *array, int row, int col)
 }
 
 
-void show_image_64FC1_as_matrix_double(const Mat &img);

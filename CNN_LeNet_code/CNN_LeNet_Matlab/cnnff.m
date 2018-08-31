@@ -94,7 +94,7 @@ for L = 2 : n                                                   % ¶ÔCNNÍøÂç²ãÊı×
         % ÒÔÏÂ´úÂë¶ÔµÚ7²ã(È«Á¬½Ó²ã)ÓĞĞ§            
             
             net.layers{L}.X = fx(net.layers{L}.W * net.layers{L-1}.X + repmat(net.layers{L}.B, 1, size(net.layers{L-1}.X, 2)));
-            
+
         %------------------------------------------------------------------            
         end
     end
