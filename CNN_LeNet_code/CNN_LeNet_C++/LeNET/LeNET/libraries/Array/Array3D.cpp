@@ -140,6 +140,13 @@ void Array3D<T>::set_zero_same_size_as(const Array3D<T> &array3D)
 
 
 template <typename T>
+void Array3D<T>::clear()
+{
+	_array3D.clear();
+}
+
+
+template <typename T>
 void Array3D<T>::normalize()
 {
 	int page = _array3D.size();
@@ -170,6 +177,40 @@ Array3D<T> Array3D<T>::sampling(const int &sample_interval) const
 	}
 
 	return sampled_array3D;
+}
+
+
+template <typename T>
+void Array3D<T>::expand_to_full_size(int col_size, int row_size)
+{
+	int X_page = _array3D.size();
+	int X_row = _array3D.at(0).at(0).size();
+	int X_col = _array3D.at(0).size();
+
+	int i, j, k;
+
+	// 将卷积对象的尺寸扩展到full尺寸，即维度由X.size()变为X.size() + 2(Ker.size() - 1)。
+
+	int X_expand_row = _array3D.at(0).at(0).size() + 2 * (row_size - 1);
+	int X_expand_col = _array3D.at(0).size() + 2 * (col_size - 1);
+
+	vector<Array2D<T>> temp;
+
+	Array2D<T> X_expand(X_expand_col, X_expand_row, 0);
+
+	for (i = 0; i < X_page; i++)
+	{
+		for (j = 0; j < X_row; j++)
+		{
+			for (k = 0; k < X_col; k++)
+			{
+				X_expand.at(col_size - 1 + k).at(j + row_size - 1) = _array3D.at(i).at(k).at(j);
+			}
+		}
+		temp.push_back(X_expand);
+	}
+
+	_array3D = temp;
 }
 
 
@@ -346,8 +387,10 @@ template void Array3D<double>::push_back(const Array2D<double> &val);
 template void Array3D<double>::set_zero();
 template void Array3D<double>::set_value(double val);
 template void Array3D<double>::set_zero_same_size_as(const Array3D<double> &array3D);
+template void Array3D<double>::clear();
 template void Array3D<double>::normalize();
 template Array3D<double> Array3D<double>::sampling(const int &sample_interval) const;
+template void Array3D<double>::expand_to_full_size(int col_size, int row_size);
 template Array2D<double> Array3D<double>::reshape_to_Array2D() const;
 template Array3D<double> Array3D<double>::operator + (const double &val) const;
 template Array3D<double> Array3D<double>::operator * (const double &val) const;

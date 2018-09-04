@@ -58,6 +58,8 @@ public:
 
 	Array2D<T> sampling(const int &sample_interval) const;
 
+	void expand_to_full_size(int col_size, int row_size);
+
 	vector<T> reshape_to_vector() const;
 
 	void append_along_row(const Array2D<T> &array2D);

@@ -7,22 +7,13 @@
 
 
 void test()
-{/*
-	Array2Dd aaa(3, 4, 1);
-	aaa.at(1).at(0) = 2;
-	aaa.at(0).at(1) = 3;
-	aaa.print();
+{
+	Array3Dd X(2, 3, 3, 1);
+	Array2Dd Ker(2, 2, 1);
+	Array3Dd conv = convolution(X, Ker, "full");
 
-	/*Array3Dd bbb = aaa.reshape(2, 2);
-
-	for (int i = 0; i < bbb.size(); i++)
-	{
-		bbb.at(i).print();
-	}*/
-
-	
-
-	return;
+	conv.at(0).print();
+	conv.at(1).print();
 }
 
 

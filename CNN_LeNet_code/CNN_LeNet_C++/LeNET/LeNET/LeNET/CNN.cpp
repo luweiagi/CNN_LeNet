@@ -278,12 +278,12 @@ void CNN::feed_forward(const Array3Dd &train_x)
 					// convn是三维卷积，此处是关键
 					if (conv_first_time)
 					{
-						z = convolution_n_dim(_layers.at(L - 1).X.at(I), _layers.at(L).Ker.at(I).at(J));
+						z = convolution(_layers.at(L - 1).X.at(I), _layers.at(L).Ker.at(I).at(J), "valid");
 						conv_first_time = false;
 					}
 					else
 					{
-						z.add(convolution_n_dim(_layers.at(L - 1).X.at(I), _layers.at(L).Ker.at(I).at(J)));
+						z.add(convolution(_layers.at(L - 1).X.at(I), _layers.at(L).Ker.at(I).at(J), "valid"));
 					}
 				}
 
@@ -335,7 +335,7 @@ void CNN::feed_forward(const Array3Dd &train_x)
 				// 特别注意:
 				// 全连接输出层涉及到三个运算 : (1)加权, (2)偏置(加), (3)sigmoid映射
 
-				_layers.at(L - 1).X_Array.clear();
+				_layers.at(L - 1).X_vector.clear();
 
 				// 对前一层输出通道数做循环
 				// 计算用于本层输入的一维向量（前一层的所有通道输出图合并为一个一维向量，以便计算）
@@ -348,16 +348,16 @@ void CNN::feed_forward(const Array3Dd &train_x)
 
 					// 将所有的特征map拉成一条列向量。还有一维就是对应的样本索引。每个样本一列，每列为对应的特征向量，此处非常巧妙！
 					// 会将每幅图像的按照列向量的形式抽取为1行，然后再将不同样本的列向量串联起来
-					_layers.at(L - 1).X_Array.append_along_row( _layers.at(L - 1).X.at(J).reshape_to_Array2D() );
+					_layers.at(L - 1).X_vector.append_along_row( _layers.at(L - 1).X.at(J).reshape_to_Array2D() );
 				}
 
 				// 计算网络的最终输出值。sigmoid(W*X + b)，注意是同时计算了batchsize个样本的输出值
 
-				int col_batchsize = _layers.at(L - 1).X_Array.size();
+				int col_batchsize = _layers.at(L - 1).X_vector.size();
 				// in = W*X + B (1)加权, (2)偏置(加)
-				Array2Dd fcl_map_in = _layers.at(L).W.product(_layers.at(L - 1).X_Array) + Array2Dd::repmat(_layers.at(L).B, 1, col_batchsize);
+				Array2Dd fcl_map_in = _layers.at(L).W.product(_layers.at(L - 1).X_vector) + Array2Dd::repmat(_layers.at(L).B, 1, col_batchsize);
 				// out = activ(in) (3)sigmoid映射
-				_layers.at(L).X_fcl = activation_function(fcl_map_in, _activation_func_type);
+				_layers.at(L).X_vector = activation_function(fcl_map_in, _activation_func_type);
 
 				// 特别注意:
 				// 全连接输出层涉及到三个运算 : (1)加权, (2)偏置(加), (3)sigmoid映射
@@ -372,11 +372,11 @@ void CNN::feed_forward(const Array3Dd &train_x)
 
 				// 计算网络的最终输出值。sigmoid(W*X + b)，注意是同时计算了batchsize个样本的输出值
 
-				int col_batchsize = _layers.at(L - 1).X_fcl.size();
+				int col_batchsize = _layers.at(L - 1).X_vector.size();
 				// in = W*X + B (1)加权, (2)偏置(加)
-				Array2Dd fcl_map_in = _layers.at(L).W.product(_layers.at(L - 1).X_fcl) + Array2Dd::repmat(_layers.at(L).B, 1, col_batchsize);
+				Array2Dd fcl_map_in = _layers.at(L).W.product(_layers.at(L - 1).X_vector) + Array2Dd::repmat(_layers.at(L).B, 1, col_batchsize);
 				// out = activ(in) (3)sigmoid映射
-				_layers.at(L).X_fcl = activation_function(fcl_map_in, _activation_func_type);
+				_layers.at(L).X_vector = activation_function(fcl_map_in, _activation_func_type);
 
 				// 特别注意:
 				// 全连接输出层涉及到三个运算 : (1)加权, (2)偏置(加), (3)sigmoid映射
@@ -385,7 +385,7 @@ void CNN::feed_forward(const Array3Dd &train_x)
 	}
 
 	// 将最后一层（全连接层）的输出结果喂给_Y，作为神经网络的输出
-	_Y = _layers.at(n-1).X_fcl;
+	_Y = _layers.at(n-1).X_vector;
 }
 
 
@@ -396,13 +396,13 @@ void CNN::back_propagation(const Array2Dd &train_y)
 	int n = _layers.size();
 
 	// 输出误差: 预测值-期望值
-	Array2Dd E = _layers.at(n - 1).X_fcl - train_y;
+	Array2Dd E = _layers.at(n - 1).X_vector - train_y;
 
 	// 输出层灵敏度(残差)
 	// 注意，这里需要说明下，这里对应的公式是 delta = (y - t).*f'(u),但是这里为什么是f'(x)呢？
 	// 因为这里其实是sigmoid求导，f'(u) = x*(1-x)，所以输入的就是x了。
 	// 其中，u表示当前层输入，x表示当前层输出。
-	_layers.at(n - 1).Delta_fcl = E * derivation(_layers.at(n - 1).X_fcl, _activation_func_type);
+	_layers.at(n - 1).Delta_vec = E * derivation(_layers.at(n - 1).X_vector, _activation_func_type);
 
 	// 代价函数是均方误差,已对样本数做平均
 	_err = 0.5 * E.pow(2).sum() / E.size();// 当前轮的当前批次的均方误差
@@ -413,7 +413,7 @@ void CNN::back_propagation(const Array2Dd &train_y)
 	if (_layers.at(1).type == 'f')
 	{
 		// 当第二层就是全连接层时,相当于输入图片拉成一个特征矢量形成的BP网络,
-		// 考虑到必须计算net.layers{1}.X_Array,所以L的下限必须到0
+		// 考虑到必须计算net.layers{1}.X_vector,所以L的下限必须到0
 		tmp = 0;
 	}
 	else
@@ -434,58 +434,51 @@ void CNN::back_propagation(const Array2Dd &train_y)
 			// 以下代码对第6(过渡全连接层),7层(全连接层)有效
 			{
 				// 典型的BP网络输出层对隐层的灵敏度(残差)的反向传播公式
-				_layers.at(L).Delta_fcl = _layers.at(L + 1).W.transpose().product(_layers.at(L + 1).Delta_fcl) * derivation(_layers.at(L).X_fcl, _activation_func_type);
+				// delta_{L} = W_{L+1}^T * delta_{L+1} .* f'(X_{L})
+				_layers.at(L).Delta_vec = _layers.at(L + 1).W.transpose().product(_layers.at(L + 1).Delta_vec) * derivation(_layers.at(L).X_vector, _activation_func_type);
 				// 作为参考，当L=6（倒数第二层）时，上式的维度如下行所示：
 				// _layers.at(L).Delta = [84, 10] [行 列]
 				// _layers.at(L + 1).W = [10, 84]
 				// _layers.at(L + 1).W.transpose() = [84 10]
 				// _layers.at(L + 1).Delta = [10 10]
-				// _layers.at(L).X_fcl = [84 10]
+				// _layers.at(L).X_vector = [84 10]
 			}
 			else if (_layers.at(L).type == 's' || _layers.at(L).type == 'c' || _layers.at(L).type == 'i')
 			// ------------------------------------------------------------------
 			// 以下代码对第5层(降采样层)有效，其“下一层”为过渡全连接层
 			{
 				// 每个输出通道图像尺寸(三维矢量,  第三维是批处理样本个数，最后两维是尺寸)
-				int SizePic_0 = _layers.at(L).X.at(0).at(0).size();
-				int SizePic_1 = _layers.at(L).X.at(0).at(0).at(0).size();
+				int SizePic_col = _layers.at(L).X.at(0).at(0).size();
+				int SizePic_row = _layers.at(L).X.at(0).at(0).at(0).size();
 
 				// 输出图像像素个数
-				int fvnum = SizePic_0 * SizePic_1;                                  
+				int fvnum = SizePic_col * SizePic_row;
 
 				// 典型的BP网络输出层对隐层的灵敏度(残差)的反向传播公式
 
 				// 若当前层是降采样层，或输入层
-				int col1 = _layers.at(L + 1).W.size();
-				int row1 = _layers.at(L + 1).W.at(0).size();
-
-				int col2 = _layers.at(L + 1).Delta_fcl.size();
-				int row2 = _layers.at(L + 1).Delta_fcl.at(0).size();
-
-				_layers.at(L).Delta_Array = _layers.at(L + 1).W.transpose().product(_layers.at(L + 1).Delta_fcl);
+				_layers.at(L).Delta_vec = _layers.at(L + 1).W.transpose().product(_layers.at(L + 1).Delta_vec);
 				// 作为参考，当L=4（第二个降采样层，下一层为全连接层）时，上式的维度如下行所示：
-				// _layers.at(L).Delta_Array = [100 10]
+				// _layers.at(L).Delta_vec = [100 10]
 				// _layers.at(L + 1).W = [120 100]
 				// _layers.at(L + 1).W.transpose() = [100 120]
-				// _layers.at(L + 1).Delta = [120 10]
+				// _layers.at(L + 1).Delta_vec = [120 10]
 
 				// 若当前层是卷积层
 				if (_layers.at(L).type == 'c')
 				{
 					// 由于卷积层存在激活函数，则还需要点乘当前层激活函数的导数，才是当前层的灵敏度
-					_layers.at(L).Delta_Array.dot_product(derivation(_layers.at(L).X_Array, _activation_func_type));
+					_layers.at(L).Delta_vec.dot_product(derivation(_layers.at(L).X_vector, _activation_func_type));
 				}
 
-				for (int J = 0; J < _layers.at(L).iChannel; J++)
-				{
-					// 此处也是批处理的
-					// 将本层的长矢量灵敏度(残差), 每一列为一个样本, reshape成通道表示(矢量化全连接->通道化全连接)
-				}
+				// 此处也是批处理的
+				// 将本层的矢量灵敏度(残差), 每一列为一个样本, reshape成通道表示(矢量化全连接->通道化全连接)
+				_layers.at(L).Delta = Array3Dd::reshape_from_Array2D(_layers.at(L).Delta_vec, _layers.at(L).iChannel, SizePic_col, SizePic_row);
 			}
 		}
 
 		// =====================================================================
-		// 以下代码对“下一层”为“下采样层”时有效
+		// 以下代码对“下一层”为“降采样层”时有效
 
 		if (_layers.at(L + 1).type == 's')
 		{

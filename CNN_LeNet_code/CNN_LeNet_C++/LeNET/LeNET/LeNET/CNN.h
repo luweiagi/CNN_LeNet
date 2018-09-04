@@ -31,7 +31,7 @@ typedef struct{
 	// 当前层的卷积核大小[row col]
 	int iSizeKer;// 只针对卷积层，其它层此参数无意义
 
-	// 当前层的输出（非全连接层输出，全连接层输出为X_fcl）
+	// 当前层的输出（非全连接层输出，全连接层输出为X_vector）
 	vector<Array3Dd> X;// 注意是_batchsize幅输入输出同时处理，所以不是2D，而是3D，维度为[_batchsize, iSizePic[0], iSizePic[1]]
 
 	// 前一层通道对当前层通道的卷积核
@@ -65,24 +65,17 @@ typedef struct{
 	vector<Array3Dd> X_down;// 注意是_batchsize幅输入输出同时处理，所以不是2D，而是3D，维度为[列_batchsize, 行iChannel*iSizePic[0]*iSizePic[1]]
 							// 只针对下采样层，其它层此参数无意义
 
-	// 将当前层所有的输出图组合成一个向量
-	Array2Dd X_Array;// 注意是_batchsize幅输入输出同时处理，所以不是一维向量，而是2D，维度为[列_batchsize, 行iChannel*iSizePic[0]*iSizePic[1]]
-					 // 只针对下一层为全连接层的非全连接层，比如LeNet的倒数第四层。其它层此参数无意义
-
-	// 全连接层的输出
-	Array2Dd X_fcl;// 注意是_batchsize幅输入输出同时处理，所以不是一维向量，而是2D，维度为[列_batchsize, 行iChannel]
-					// 只针对全连接层的输出，其它层此参数无意义。
+	// 全连接层的输出，或者下一层为全连接层的当前层所有输出图组合成的一个向量
+	Array2Dd X_vector;// 注意是_batchsize幅输入输出同时处理，所以不是一维向量，而是2D，维度为[列_batchsize, 行iChannel]
+					// 只针对全连接层的输出，以及下一层为全连接层的非全连接层（比如LeNet的第二个降采样层）。其它层此参数无意义
 
 	// 当前层的灵敏度(残差)，即当前层的输入对误差的偏导
-	vector<Array3Dd> Delta111;// 注意是_batchsize幅输入输出同时处理，所以不是2D，而是3D，维度为[_batchsize, iSizePic[0], iSizePic[1]]
+	vector<Array3Dd> Delta;// 注意是_batchsize幅输入输出同时处理，所以不是2D，而是3D，维度为[_batchsize, iSizePic[0], iSizePic[1]]
 						   // 注意只针对非全连接层
 
 	// 当前层的灵敏度(残差)，即当前层的输入对误差的偏导
-	Array2Dd Delta_fcl;// 注意只针对全连接层，虽是一维向量，但是有_batchsize列，所以是二维的。
-
-	// 当前层的灵敏度一维向量，即当前层的输入对误差的偏导
-	Array2Dd Delta_Array;// 虽是一维向量，但有_batchsize列，所以是二维的。
-						 // 注意只针对下层为全连接层的降采样层、输入层、卷积层等有方块图输出的层。
+	Array2Dd Delta_vec;// 虽是一维向量，但是有_batchsize列，所以是二维的。
+					   // 注意只针对全连接层，以及下层为全连接层的降采样层、输入层、卷积层等有方块图输出的层
 
 } Layer;
 

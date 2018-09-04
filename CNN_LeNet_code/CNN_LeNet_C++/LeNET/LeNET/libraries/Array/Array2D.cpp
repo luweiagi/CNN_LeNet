@@ -323,6 +323,38 @@ Array2D<T> Array2D<T>::sampling(const int &sample_interval) const
 }
 
 
+template <typename T>
+void Array2D<T>::expand_to_full_size(int col_size, int row_size)
+{
+	int X_row = _array2D.at(0).size();
+	int X_col = _array2D.size();
+
+	int i, j;
+
+	// 将卷积对象的尺寸扩展到full尺寸，即维度由X.size()变为X.size() + 2(Ker.size() - 1)。
+
+	int X_expand_row = _array2D.at(0).size() + 2 * (row_size - 1);
+	int X_expand_col = _array2D.size() + 2 * (col_size - 1);
+
+	
+
+	vector<T> vec_temp;
+	vec_temp.assign(X_expand_row, 0);
+	vector<vector<T>> temp;
+	temp.assign(X_expand_col, vec_temp);
+
+	for (i = 0; i < X_row; i++)
+	{
+		for (j = 0; j < X_col; j++)
+		{
+			temp.at(col_size - 1 + j).at(i + row_size - 1) = _array2D.at(j).at(i);
+		}
+	}
+
+	_array2D = temp;
+}
+
+
 // 将2D变成一维向量，按照matlab的做法，是按照列的，例如
 // a = [1, 2, 3;
 //	    4, 5, 6];
@@ -370,9 +402,7 @@ void Array2D<T>::append_along_row(const Array2D<T> &array2D)
 
 	for (int i = 0; i < new_col; i++)
 	{
-		vector<T> & v1 = _array2D.at(i);
-		const vector<T> & v2 = array2D.at(i);
-		v1.insert(v1.end(), v2.begin(), v2.end());
+		_array2D.at(i).insert(_array2D.at(i).end(), array2D.at(i).begin(), array2D.at(i).end());
 	}
 }
 
@@ -909,6 +939,7 @@ template void Array2D<double>::clear();
 template void Array2D<double>::normalize();
 template void Array2D<double>::set_rand(int col, int row, double minimum, double maximum);
 template Array2D<double> Array2D<double>::sampling(const int &sample_interval) const;
+template void Array2D<double>::expand_to_full_size(int col_size, int row_size);
 template vector<double> Array2D<double>::reshape_to_vector() const;
 template void Array2D<double>::append_along_row(const Array2D<double> &array2D);
 //template Array3D<double> Array2D<double>::reshape(int col, int row) const;

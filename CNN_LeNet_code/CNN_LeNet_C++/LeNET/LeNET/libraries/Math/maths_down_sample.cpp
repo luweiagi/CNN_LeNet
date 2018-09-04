@@ -37,7 +37,7 @@ Array3Dd down_sample_mean_pooling(const Array3Dd &vector_array, const int sample
 {
 	Array2Dd mean_pooling_convolution_kernel(sample_num, sample_num, double(1.0 / pow(sample_num, 2)));
 
-	Array3Dd Z = convolution_n_dim(vector_array, mean_pooling_convolution_kernel);
+	Array3Dd Z = convolution(vector_array, mean_pooling_convolution_kernel, "valid");
 
 	Array3Dd Y = Z.sampling(sample_num);
 
