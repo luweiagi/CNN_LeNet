@@ -91,9 +91,6 @@ public:
 		return array2D;
 	}
 
-	// 将Array2D的row转成Array3D的col和row，Array2D的col转为Array3D的page
-	//Array3D<T> reshape(int col, int row) const;
-
 	// 矩阵转置
 	Array2D<T> transpose() const;
 

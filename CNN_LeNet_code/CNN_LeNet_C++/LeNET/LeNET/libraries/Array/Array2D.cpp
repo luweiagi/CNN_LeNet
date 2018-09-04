@@ -406,41 +406,6 @@ void Array2D<T>::append_along_row(const Array2D<T> &array2D)
 	}
 }
 
-/*
-template <typename T>
-Array3D<T> Array2D<T>::reshape(int col, int row) const
-{
-	int page = _array2D.size();
-	if(page <= 0)
-	{
-		cout << Array2D is empty!" << endl << "Array2D.reshape() failed!" << endl;
-		Array3D<T> temp;
-		return temp;
-	}
-
-	int line_size = _array2D.at(0).size();
-	if (line_size != col * row)
-	{
-		cout << "size not match!" << endl << "Array2D.reshape() failed!" << endl;
-		Array3D<T> temp;
-		return temp;
-	}
-
-	Array3D<T> vec_arr2D;
-	Array2D<T> arr2D;
-
-	int segment_num = line_size / row;
-	for (int i = 0; i < page, i++)
-	{
-		for (int j = 0; j < segment_num; j++)
-		{
-			vector<T> vec_segment(_array2D.at(i).begin() + j * segment_num, _array2D.at(i).begin() + (j + 1) * segment_num);
-			arr2D.push_back(vec_segment);
-		}
-		vec_arr2D.push_back(arr2D);
-	}
-}
-*/
 
 template <typename T>
 Array2D<T> Array2D<T>::transpose() const
@@ -942,7 +907,6 @@ template Array2D<double> Array2D<double>::sampling(const int &sample_interval) c
 template void Array2D<double>::expand_to_full_size(int col_size, int row_size);
 template vector<double> Array2D<double>::reshape_to_vector() const;
 template void Array2D<double>::append_along_row(const Array2D<double> &array2D);
-//template Array3D<double> Array2D<double>::reshape(int col, int row) const;
 template Array2D<double> Array2D<double>::transpose() const;
 template void Array2D<double>::flip_xy();
 template void Array2D<double>::class_0_to_9(int length);
