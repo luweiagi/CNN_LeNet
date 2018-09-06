@@ -8,20 +8,24 @@
 
 void test()
 {
-	Array3Dd X(2, 3, 3, 1);
-	Array2Dd Ker(2, 2, 1);
-	Array3Dd conv = convolution(X, Ker, "full");
+	Array3Dd a(2, 3, 2, 1);
+	a.at(0).at(0).at(0) = 5;
+	a.at(1).at(0).at(0) = 6;
+	a.at(1).at(0).at(1) = 3;
+	a.at(1).at(1).at(0) = 2;
+	vector<double> b = a.reshape_to_vector();
+	print(b);
 
-	conv.at(0).print();
-	conv.at(1).print();
+	double ddd = sum_vector(b);
+	cout << ddd << endl;
 }
 
 
 int main()
 {
-	test();
+	//test();
 
-	/*
+	//*
 
 	// ****************************** ´´½¨ÑµÁ·¼¯ ***************************************************** //
 

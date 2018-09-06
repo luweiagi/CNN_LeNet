@@ -40,14 +40,22 @@ typedef struct{
 	// 前一层通道对当前层通道的卷积核的偏置
 	vector<vector<Array2Dd>> Ker_delta;// Ker_delta[I][J], I为前一层通道数，J为当前层通道数。只针对卷积层，其它层此参数无意义
 
+	// 前一层通道对当前层通道的卷积核的梯度
+	vector<vector<Array2Dd>> Ker_grad;// Ker_grad[I][J], I为前一层通道数，J为当前层通道数。只针对卷积层，其它层此参数无意义
+
 	// 当前层与上一层的连接权值
 	Array2Dd W;// 只针对全连接层，其它层此参数无意义
-			   // 注意是W[I列][J行],I为当前层全连接输入个数，J为当前层数目
-			   // 这么理解：该层有J个输出，那当然有J列了，每个输出有I个来自前层的输入，那就有I行了
+			   // 注意是W[I列][J行],I为当前层全连接输入个数（上一层的数目），J为当前层数目
+			   // 比如第7层，就是W[84行x120列]
 
 	// ？？？
 	Array2Dd W_delta;// 只针对全连接层，其它层此参数无意义
-					 // 注意是W_delta[I列][J行],I为当前层全连接输入个数，J为当前层数目
+					 // 注意是W[I列][J行],I为当前层全连接输入个数（上一层的数目），J为当前层数目
+
+	// 当前层与上一层的连接权值的梯度
+	Array2Dd W_grad;// 只针对全连接层，其它层此参数无意义
+					// 注意是W[I列][J行],I为当前层全连接输入个数（上一层的数目），J为当前层数目
+					// 比如第7层，就是W[84行x120列]
 
 	// 当前层输出通道的加性偏置
 	vector<double> B;
@@ -55,11 +63,17 @@ typedef struct{
 	// ？？？
 	vector<double> B_delta;
 
+	// 当前层输出通道的加性偏置的梯度
+	vector<double> B_grad;
+
 	// 当前层输出通道的乘性偏置
 	vector<double> Beta;// 只针对下采样层，其它层此参数无意义
 
 	// ？？？
 	vector<double> Beta_delta;// 只针对下采样层，其它层此参数无意义
+
+	// 当前层输出通道的乘性偏置的梯度
+	vector<double> Beta_grad;// 只针对下采样层，其它层此参数无意义
 
 	// 下采样的输入
 	vector<Array3Dd> X_down;// 注意是_batchsize幅输入输出同时处理，所以不是2D，而是3D，维度为[列_batchsize, 行iChannel*iSizePic[0]*iSizePic[1]]
@@ -69,12 +83,12 @@ typedef struct{
 	Array2Dd X_vector;// 注意是_batchsize幅输入输出同时处理，所以不是一维向量，而是2D，维度为[列_batchsize, 行iChannel]
 					// 只针对全连接层的输出，以及下一层为全连接层的非全连接层（比如LeNet的第二个降采样层）。其它层此参数无意义
 
-	// 当前层的灵敏度(残差)，即当前层的输入对误差的偏导
+	// 当前层的灵敏度(残差)，即当前层的输入（特别注意：此输入为紧接着进激活函数的那个输入，即加了乘性和加性偏置后的输入）对误差的偏导
 	vector<Array3Dd> Delta;// 注意是_batchsize幅输入输出同时处理，所以不是2D，而是3D，维度为[_batchsize, iSizePic[0], iSizePic[1]]
 						   // 注意只针对非全连接层
 
 	// 当前层的灵敏度(残差)，即当前层的输入对误差的偏导
-	Array2Dd Delta_vec;// 虽是一维向量，但是有_batchsize列，所以是二维的。
+	Array2Dd Delta_vector;// 虽是一维向量，但是有_batchsize列，所以是二维的。
 					   // 注意只针对全连接层，以及下层为全连接层的降采样层、输入层、卷积层等有方块图输出的层
 
 } Layer;

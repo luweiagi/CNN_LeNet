@@ -214,6 +214,37 @@ void Array3D<T>::expand_to_full_size(int col_size, int row_size)
 }
 
 
+// 将三维的Array3D变成一维向量，一维向量先按页分，再按列分
+template <typename T>
+vector<T> Array3D<T>::reshape_to_vector() const
+{
+	int page = _array3D.size();
+	if (page <= 0)
+	{
+		cout << "Array3D is empty!" << endl << "Array3D.reshape_to_vector() failed!" << endl;
+		vector<T> temp;
+		return temp;
+	}
+
+	int col = _array3D.at(0).size();
+	int row = _array3D.at(0).at(0).size();
+
+	vector<T> vec_page;
+	vector<T> vec_col;
+	for (int i = 0; i < page; i++)
+	{
+		vec_col.clear();
+		for (int j = 0; j < col; j++)
+		{
+			vec_col.insert(vec_col.end(), _array3D.at(i).at(j).begin(), _array3D.at(i).at(j).end());
+		}
+		vec_page.insert(vec_page.end(), vec_col.begin(), vec_col.end());
+	}
+	
+	return vec_page;
+}
+
+
 // 将3D的最后两个D变成一维向量，按照matlab的做法，是按照列的，例如
 // a = [1, 2, 3;
 //	    4, 5, 6];
@@ -240,6 +271,49 @@ Array2D<T> Array3D<T>::reshape_to_Array2D() const
 
 
 template <typename T>
+Array3D<T> Array3D<T>::operator + (const Array3D<T> &array3D) const
+{
+	int page = _array3D.size();
+
+	if (page <= 0)
+	{
+		return array3D;
+	}
+
+	int page_B = array3D.size();
+	if (page_B < 0)
+	{
+		cout << "Array3D is empty!" << endl << "Array3D.operator + Array3D failed!" << endl;
+		Array3D<T> temp;
+		return temp;
+	}
+
+	int col = _array3D.at(0).size();
+	int row = _array3D.at(0).at(0).size();
+
+	int col_B = array3D.at(0).size();
+	int row_B = array3D.at(0).at(0).size();
+
+	if (page != page_B || col != col_B || row != row_B)
+	{
+		cout << "size is not same! " << endl << "Array3D.operator + Array3D failed!" << endl;
+		Array3D<T> temp;
+		return temp;
+	}
+
+
+	Array3D<T> array3D_ret;
+
+	for (int i = 0; i < page; i++)
+	{
+		array3D_ret.push_back(_array3D.at(i) + array3D.at(i));
+	}
+
+	return array3D_ret;
+}
+
+
+template <typename T>
 Array3D<T> Array3D<T>::operator + (const T &val) const
 {
 	int page = _array3D.size();
@@ -255,6 +329,43 @@ Array3D<T> Array3D<T>::operator + (const T &val) const
 	for (int i = 0; i < page; i++)
 	{
 		array3D_ret.push_back(_array3D.at(i) + val);
+	}
+
+	return array3D_ret;
+}
+
+
+template <typename T>
+Array3D<T> Array3D<T>::operator * (const Array3D<T> &array3D) const
+{
+	int page = _array3D.size();
+	int page_B = array3D.size();
+	if (page <= 0 || page_B < 0)
+	{
+		cout << "Array3D is empty!" << endl << "Array3D.operator * Array3D failed!" << endl;
+		Array3D<T> temp;
+		return temp;
+	}
+
+	int col = _array3D.at(0).size();
+	int row = _array3D.at(0).at(0).size();
+
+	int col_B = array3D.at(0).size();
+	int row_B = array3D.at(0).at(0).size();
+
+	if (page != page_B || col != col_B || row != row_B)
+	{
+		cout << "size is not same! " << endl << "Array3D.operator * Array3D failed!" << endl;
+		Array3D<T> temp;
+		return temp;
+	}
+
+
+	Array3D<T> array3D_ret;
+
+	for (int i = 0; i < page; i++)
+	{
+		array3D_ret.push_back(_array3D.at(i) * array3D.at(i));
 	}
 
 	return array3D_ret;
@@ -391,8 +502,11 @@ template void Array3D<double>::clear();
 template void Array3D<double>::normalize();
 template Array3D<double> Array3D<double>::sampling(const int &sample_interval) const;
 template void Array3D<double>::expand_to_full_size(int col_size, int row_size);
+template vector<double> Array3D<double>::reshape_to_vector() const;
 template Array2D<double> Array3D<double>::reshape_to_Array2D() const;
+template Array3D<double> Array3D<double>::operator + (const Array3D<double> &array3D) const;
 template Array3D<double> Array3D<double>::operator + (const double &val) const;
+template Array3D<double> Array3D<double>::operator * (const Array3D<double> &array3D) const;
 template Array3D<double> Array3D<double>::operator * (const double &val) const;
 template void Array3D<double>::add(const Array3D<double> &array3D);
 template void Array3D<double>::dot_product(const Array3D<double> &array3D);

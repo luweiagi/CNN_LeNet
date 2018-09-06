@@ -19,6 +19,13 @@ Array2D<T>::Array2D<T>(int col, int row, T value)
 
 
 template <typename T>
+Array2D<T>::Array2D(const vector<vector<T>> &vec_vec)
+{
+	_array2D = vec_vec;
+}
+
+
+template <typename T>
 Array2D<T>::Array2D<T>(const Mat &img)
 {
 	int row, col, i;
@@ -449,14 +456,18 @@ Array2D<T> Array2D<T>::transpose() const
 
 
 template <typename T>
-void Array2D<T>::flip_xy()
+Array2D<T> Array2D<T>::flip_xy() const
 {
-	for (int i = 0; i < _array2D.size(); i++)
+	vector<vector<T>>  vec_vec = _array2D;
+	
+	for (int i = 0; i < vec_vec.size(); i++)
 	{
-		reverse(_array2D.at(i).begin(), _array2D.at(i).end());
+		reverse(vec_vec.at(i).begin(), vec_vec.at(i).end());
 	}
+	reverse(vec_vec.begin(), vec_vec.end());
 
-	reverse(_array2D.begin(), _array2D.end());
+	Array2D<T> array2D(vec_vec);
+	return array2D;
 }
 
 
@@ -782,10 +793,61 @@ T Array2D<T>::sum() const
 
 
 template <typename T>
+vector<T> Array2D<T>::mean() const
+{
+	// 按列求平均，结果为列向量
+	int col = _array2D.size();
+	if (col <= 0)
+	{
+		cout << "Array2D is empty!" << endl << "Array2D.mean() failed!" << endl;
+		vector<T> temp;
+		return temp;
+	}
+
+	int row = _array2D.at(0).size();
+	if (row <= 0)
+	{
+		cout << "Array2D is empty!" << endl << "Array2D.mean() failed!" << endl;
+		vector<T> temp;
+		return temp;
+	}
+
+	vector<T> vec_ret;
+	vec_ret.assign(row, 0);
+
+	int i;
+	for (i = 0; i < col; ++i)
+	{
+		vec_ret = vec_ret + (vector<T>)_array2D.at(i);
+	}
+
+	for (i = 0; i < row; ++i)
+	{
+		vec_ret.at(i) = vec_ret.at(i) / col;
+	}
+
+	return vec_ret;
+}
+
+
+template <typename T>
 Array2D<T> Array2D<T>::pow(const int power) const
 {
 	int col = _array2D.size();
+	if (col <= 0)
+	{
+		cout << "Array2D is empty!" << endl << "Array2D.pow() failed!" << endl;
+		Array2D<T> temp;
+		return temp;
+	}
+
 	int row = _array2D.at(0).size();
+	if (row <= 0)
+	{
+		cout << "Array2D is empty!" << endl << "Array2D.pow() failed!" << endl;
+		Array2D<T> temp;
+		return temp;
+	}
 
 	Array2D<T> pow_ret(col, row, 0);
 
@@ -889,6 +951,7 @@ Mat Array2D<T>::to_Mat_64FC1() const
 
 // only define for double
 template Array2D<double>::Array2D<double>(int col, int row, double value);
+template Array2D<double>::Array2D<double>(const vector<vector<double>> &vec_vec);
 template Array2D<double>::Array2D<double>(const Mat &img);
 template void Array2D<double>::from_image_64FC1(const Mat &img);
 template void Array2D<double>::create(int col, int row, double value);
@@ -908,7 +971,7 @@ template void Array2D<double>::expand_to_full_size(int col_size, int row_size);
 template vector<double> Array2D<double>::reshape_to_vector() const;
 template void Array2D<double>::append_along_row(const Array2D<double> &array2D);
 template Array2D<double> Array2D<double>::transpose() const;
-template void Array2D<double>::flip_xy();
+template Array2D<double> Array2D<double>::flip_xy() const;
 template void Array2D<double>::class_0_to_9(int length);
 template Array2D<double> Array2D<double>::operator + (const Array2D<double> &array2D) const;
 template Array2D<double> Array2D<double>::operator + (const double &val) const;
@@ -919,6 +982,7 @@ template void Array2D<double>::add(const Array2D<double> &array2D);
 template void Array2D<double>::dot_product(const Array2D<double> &array2D);
 template Array2D<double> Array2D<double>::product(const Array2D<double> &array2D) const;
 template double Array2D<double>::sum() const;
+template vector<double> Array2D<double>::mean() const;
 template Array2D<double> Array2D<double>::pow(const int power) const;
 template int Array2D<double>::size() const;
 template void Array2D<double>::print() const;

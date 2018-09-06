@@ -143,11 +143,15 @@ void CNN::init()
 			_layers.at(L).Ker.resize(_layers.at(L - 1).iChannel);
 			_layers.at(L).Ker_delta.resize(_layers.at(L - 1).iChannel);
 
+			_layers.at(L).Ker_grad.resize(_layers.at(L - 1).iChannel);
+
 			// 对本层输入通道数做循环
 			for (int I = 0; I < _layers.at(L - 1).iChannel; I++)
 			{
 				_layers.at(L).Ker.at(I).resize(_layers.at(L).iChannel);
 				_layers.at(L).Ker_delta.at(I).resize(_layers.at(L).iChannel);
+
+				_layers.at(L).Ker_grad.at(I).resize(_layers.at(L).iChannel);// 这里仅仅初始化大小，不初始化值。值会在反向传播中给出
 
 				// 对本层输出通道数做循环
 				for (int J = 0; J < _layers.at(L).iChannel; J++)
@@ -163,6 +167,8 @@ void CNN::init()
 			// 对本层输出通道加性偏置进行0值初始化
 			_layers.at(L).B.assign(_layers.at(L).iChannel, 0);
 			_layers.at(L).B_delta.assign(_layers.at(L).iChannel, 0);
+
+			_layers.at(L).Delta.resize(_layers.at(L).iChannel);// 敏感度图的大小初始化，但不赋值
 
 			cout << "convolutional layer " << L + 1 << " has initialised!" << endl;
 		}
@@ -185,6 +191,8 @@ void CNN::init()
 			// 对本层输出通道加性偏置进行0值初始化
 			_layers.at(L).B.assign(_layers.at(L).iChannel, 0);
 			_layers.at(L).B_delta.assign(_layers.at(L).iChannel, 0);
+
+			_layers.at(L).Delta.resize(_layers.at(L).iChannel);// 敏感度图的大小初始化，但不赋值
 
 			cout << "subsampling layer " << L + 1 << " has initialised!" << endl;
 		}
@@ -402,7 +410,7 @@ void CNN::back_propagation(const Array2Dd &train_y)
 	// 注意，这里需要说明下，这里对应的公式是 delta = (y - t).*f'(u),但是这里为什么是f'(x)呢？
 	// 因为这里其实是sigmoid求导，f'(u) = x*(1-x)，所以输入的就是x了。
 	// 其中，u表示当前层输入，x表示当前层输出。
-	_layers.at(n - 1).Delta_vec = E * derivation(_layers.at(n - 1).X_vector, _activation_func_type);
+	_layers.at(n - 1).Delta_vector = E * derivation(_layers.at(n - 1).X_vector, _activation_func_type);
 
 	// 代价函数是均方误差,已对样本数做平均
 	_err = 0.5 * E.pow(2).sum() / E.size();// 当前轮的当前批次的均方误差
@@ -435,7 +443,7 @@ void CNN::back_propagation(const Array2Dd &train_y)
 			{
 				// 典型的BP网络输出层对隐层的灵敏度(残差)的反向传播公式
 				// delta_{L} = W_{L+1}^T * delta_{L+1} .* f'(X_{L})
-				_layers.at(L).Delta_vec = _layers.at(L + 1).W.transpose().product(_layers.at(L + 1).Delta_vec) * derivation(_layers.at(L).X_vector, _activation_func_type);
+				_layers.at(L).Delta_vector = _layers.at(L + 1).W.transpose().product(_layers.at(L + 1).Delta_vector) * derivation(_layers.at(L).X_vector, _activation_func_type);
 				// 作为参考，当L=6（倒数第二层）时，上式的维度如下行所示：
 				// _layers.at(L).Delta = [84, 10] [行 列]
 				// _layers.at(L + 1).W = [10, 84]
@@ -457,7 +465,7 @@ void CNN::back_propagation(const Array2Dd &train_y)
 				// 典型的BP网络输出层对隐层的灵敏度(残差)的反向传播公式
 
 				// 若当前层是降采样层，或输入层
-				_layers.at(L).Delta_vec = _layers.at(L + 1).W.transpose().product(_layers.at(L + 1).Delta_vec);
+				_layers.at(L).Delta_vector = _layers.at(L + 1).W.transpose().product(_layers.at(L + 1).Delta_vector);
 				// 作为参考，当L=4（第二个降采样层，下一层为全连接层）时，上式的维度如下行所示：
 				// _layers.at(L).Delta_vec = [100 10]
 				// _layers.at(L + 1).W = [120 100]
@@ -468,29 +476,62 @@ void CNN::back_propagation(const Array2Dd &train_y)
 				if (_layers.at(L).type == 'c')
 				{
 					// 由于卷积层存在激活函数，则还需要点乘当前层激活函数的导数，才是当前层的灵敏度
-					_layers.at(L).Delta_vec.dot_product(derivation(_layers.at(L).X_vector, _activation_func_type));
+					_layers.at(L).Delta_vector.dot_product(derivation(_layers.at(L).X_vector, _activation_func_type));
 				}
 
 				// 此处也是批处理的
 				// 将本层的矢量灵敏度(残差), 每一列为一个样本, reshape成通道表示(矢量化全连接->通道化全连接)
-				_layers.at(L).Delta = Array3Dd::reshape_from_Array2D(_layers.at(L).Delta_vec, _layers.at(L).iChannel, SizePic_col, SizePic_row);
+				_layers.at(L).Delta = Array3Dd::reshape_from_Array2D(_layers.at(L).Delta_vector, _layers.at(L).iChannel, SizePic_col, SizePic_row);
 			}
 		}
 
 		// =====================================================================
 		// 以下代码对“下一层”为“降采样层”时有效
+		// 参考资料：http://www.cnblogs.com/tornadomeet/p/3468450.html
 
 		if (_layers.at(L + 1).type == 's')
 		{
+			// 一般“卷积层”的下一层是“降采样层”
 
+			// 对本层输出通道数做循环
+			for (int J = 0; J < _layers.at(L).iChannel; J++)
+			{
+				// 本层导数
+				Array3Dd deriv_J = derivation(_layers.at(L).X.at(J), _activation_func_type);
+
+				// 下一层的上采样，复制到原来的尺寸
+				Array3Dd next_layer_delta_J = up_sample(_layers.at(L + 1).Delta.at(J), _layers.at(L + 1).iSample, _down_sample_type);
+
+				// 警告：下采样后和上采样完，两者的尺寸不一致，比如当尺寸为奇数5时。但因为LeNet5的此处大小为偶数，所以此问题暂时不存在
+
+				// 以下代码用于下采样层的计算
+				// 这里乘以_layers.at(L + 1).Beta.at(J)（类似W），是因为下一层的下采样层的Delta，并没有乘上乘性偏置Beta（为什么？看Delta的定义）
+				_layers.at(L).Delta.at(J) = deriv_J * next_layer_delta_J * ((1.0 / (double)pow(_layers.at(L + 1).iSample, 2)) * _layers.at(L + 1).Beta.at(J));
+			}
 		}
 
 		// =====================================================================
-		// 以下代码对“下一层”为“卷积层”时有效
+		// 以下代码对“下一层”为“卷积层”时有效，这里默认是降采样层层（输入层不算）
+		// 参考资料：http://www.cnblogs.com/tornadomeet/p/3468450.html
 
 		if (_layers.at(L + 1).type == 'c')
 		{
+			// 对本层输出通道数做循环
+			for (int I = 0; I < _layers.at(L).iChannel; I++)
+			{
+				Array3Dd z = _layers.at(L).X.at(0);
+				z.clear();
 
+				// 对下一层输出通道数做循环
+				for (int J = 0; J < _layers.at(L + 1).iChannel; J++)
+				{
+					// 当前层灵敏度(残差)net.layers{ L }.Delta{ J }计算
+					z = z + convolution(_layers.at(L + 1).Delta.at(J), _layers.at(L + 1).Ker.at(I).at(J).flip_xy(), "full");
+				}
+
+				// 因为这里默认是降采样层，所以不存在激活函数，所以f'(u)=1，即可省略乘f'(u)
+				_layers.at(L).Delta.at(I) = z;
+			}
 		}
 
 		// =====================================================================
@@ -510,7 +551,20 @@ void CNN::back_propagation(const Array2Dd &train_y)
 
 		if (_layers.at(L).type == 'c')
 		{
-
+			// 对本层输出通道数做循环
+			for (int J = 0; J < _layers.at(L).iChannel; J++)
+			{
+				// 对上一层输出通道数做循环
+				for (int I = 0; I < _layers.at(L - 1).iChannel; I++)
+				{
+					// 特别注意:
+					// (1)等价关系 rot180(conv2(a, rot180(b), 'valid')) = conv2(rot180(a), b, 'valid')
+					// (2)若ndims(a) = ndims(b) = 3, 则convn(filpall(a), b, 'valid')表示三个维度上同时相关运算
+					// (3)若size(a, 3) = size(b, 3), 则上式输出第三维为1, 表示参与训练样本的叠加和(批处理算法), 结果要对样本数做平均
+				
+					//_layers.at(L).Ker_grad.at(I).at(J) = convolution(_layers.at(L - 1).X.at(I),3), net.layers{L}.Delta{J}, 'valid') / size(net.layers{L}.Delta{J}, 3);
+				}
+			}
 		}
 
 		// =====================================================================
@@ -518,7 +572,20 @@ void CNN::back_propagation(const Array2Dd &train_y)
 
 		if (_layers.at(L).type == 's')
 		{
+			_layers.at(L).Beta_grad.resize(_layers.at(L).iChannel);
+			_layers.at(L).B_grad.resize(_layers.at(L).iChannel);
 
+			int batch_num = _layers.at(L).Delta.at(0).size();
+
+			for (int J = 0; J < _layers.at(L).iChannel; J++)
+			{
+				// 这里对下采样层的Beta的梯度求解，类似于W，然后求平均
+				// 为什么是全部相加呢？因为Beta和B影响了全部的元素啊。。当然要相加了
+				_layers.at(L).Beta_grad.at(J) = sum_vector(_layers.at(L).Delta.at(J).reshape_to_vector() * (_layers.at(L).X_down.at(J).reshape_to_vector())) * (1.0 / (double)_layers.at(L).Delta.at(J).size());
+
+				// 对所有net.layers{L}.Delta{J}的叠加,结果要对样本数做平均
+				_layers.at(L).B_grad.at(J) = sum_vector(_layers.at(L).Delta.at(J).reshape_to_vector()) * (1.0 / (double)_layers.at(L).Delta.at(J).size());
+			}
 		}
 
 		// =====================================================================
@@ -526,7 +593,11 @@ void CNN::back_propagation(const Array2Dd &train_y)
 
 		if (_layers.at(L).type == 'f')
 		{
+			// 权值矩阵梯度, 结果要对样本数做平均。这里体现了batch的作用，是一个batch的平均
+			_layers.at(L).W_grad = _layers.at(L).Delta_vector.product(_layers.at(L - 1).X_vector.transpose()) * (1.0 / _layers.at(L).Delta_vector.size());
 
+			// 输出层灵敏度(残差)就是偏置(加性)的梯度, 这里也要对样本数做平均。这里体现了batch的作用，是一个batch的平均
+			_layers.at(L).B_grad = _layers.at(L).Delta_vector.mean();
 		}
 
 		// =====================================================================

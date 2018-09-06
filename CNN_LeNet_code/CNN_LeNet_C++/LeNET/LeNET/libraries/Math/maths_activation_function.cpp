@@ -171,22 +171,22 @@ Array2Dd derivation(const Array2Dd &vector_array, activation_function_type activ
 
 	switch (activ_func_type)
 	{
-	case SoftMax:
-	{
-		return derivation_soft_max(vector_array);
-		break;
-	}
-	case ReLU:
-	{
-		return derivation_relu(vector_array);
-		break;
-	}
-	default:
-	{
-		Array2Dd temp;
-		return temp;
-		break;
-	}
+		case SoftMax:
+		{
+			return derivation_soft_max(vector_array);
+			break;
+		}
+		case ReLU:
+		{
+			return derivation_relu(vector_array);
+			break;
+		}
+		default:
+		{
+			Array2Dd temp;
+			return temp;
+			break;
+		}
 	}
 }
 
@@ -236,4 +236,50 @@ Array2Dd derivation_relu(const Array2Dd &vector_array)
 	// ToDo
 	Array2Dd temp;
 	return temp;
+}
+
+
+Array3Dd derivation(const Array3Dd &vector_array, activation_function_type activ_func_type)
+{
+	int page = vector_array.size();
+	if (page == 0)
+	{
+		cout << "Array3Dd is empty!" << endl << "Array3Dd.derivation() failed!" << endl;
+		Array3Dd temp;
+		return temp;
+	}
+
+	switch (activ_func_type)
+	{
+		case SoftMax:
+		{
+			Array3Dd vec_array = vector_array;
+			vec_array.clear();
+			Array2Dd array;
+			for (int i = 0; i < vector_array.size(); i++)
+			{
+				vec_array.push_back(derivation_soft_max(vector_array.at(i)));
+			}
+			return vec_array;
+			break;
+		}
+		case ReLU:
+		{
+			Array3Dd vec_array = vector_array;
+			vec_array.clear();
+			Array2Dd array;
+			for (int i = 0; i < vector_array.size(); i++)
+			{
+				vec_array.push_back(derivation_relu(vector_array.at(i)));
+			}
+			return vec_array;
+			break;
+		}
+		default:
+		{
+			Array3Dd temp;
+			return temp;
+			break;
+		}
+	}
 }

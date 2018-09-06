@@ -45,6 +45,8 @@ public:
 
 	void expand_to_full_size(int col_size, int row_size);
 
+	vector<T> reshape_to_vector() const;
+
 	Array2D<T> reshape_to_Array2D() const;
 
 	// 将列向量转为n幅图像
@@ -92,7 +94,11 @@ public:
 
 	// ************************** 数学运算 **************************************** //
 
+	Array3D<T> operator + (const Array3D<T> &array3D) const;
+
 	Array3D<T> operator + (const T &val) const;
+
+	Array3D<T> operator * (const Array3D<T> &array3D) const;
 
 	Array3D<T> operator * (const T &val) const;
 

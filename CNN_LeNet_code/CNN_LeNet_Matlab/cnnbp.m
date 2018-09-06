@@ -42,6 +42,7 @@ for L = (n - 1) : -1 : tmp
             
             % µäĞÍµÄBPÍøÂçÊä³ö²ã¶ÔÒş²ãµÄÁéÃô¶È(²Ğ²î)µÄ·´Ïò´«²¥¹«Ê½
             net.layers{L}.Delta_Array = (net.layers{L+1}.W' * net.layers{L+1}.Delta);
+            % ÕâÀïÓĞÎÊÌâ°¡£¬Èç¹ûL²ãÊÇsÄØ£¬ÄÇÒ²Òª³ËÉÏÆä³ËĞÔÆ«ÖÃbeta°É£¿×¢£ºÕâÀï²»ÓÃ³Ë£¬ËùÒÔÒªÇå³şS²ãµÄDeltaÊÇÈ±ÁË³ËĞÔÆ«ÖÃbetaµÄ£¬ÔÚÓÃµ½µÄÊ±ºò³ËÉÏ¼´¿É¡£
             if strcmp(net.layers{L}.type, 'c')
                 net.layers{L}.Delta_Array = net.layers{L}.Delta_Array .* dy(net.layers{L}.X_Array);
             end
@@ -68,8 +69,8 @@ for L = (n - 1) : -1 : tmp
             
             % ÎªÉÏ²ÉÑùº¯Êı,ÕâÀïÓÃexpandº¯Êı´úÌæÎÄÏ×ÖĞµÄkron(kron½öÊÊÓÃ¶şÎ¬Çé¿ö)£¬ÏÂÒ»²ãµÄÉÏ²ÉÑù£¬¸´ÖÆµ½Ô­À´µÄ³ß´ç
 %             tmp2 = expand(net.layers{L + 1}.Delta{J}, [net.layers{L + 1}.iSample,net.layers{L + 1}.iSample,1]);   
-            tmp2 = up(net.layers{L + 1}.Delta{J}, net.layers{L + 1}.iSample);
-            
+            tmp2 = up(net.layers{L + 1}.Delta{J}, net.layers{L + 1}.iSample) ;% / net.layers{L + 1}.iSample ^ 2;
+
             % net.layers{L}.Delta{J} = net.layers{L}.X{J} .* (1 - net.layers{L}.X{J}) .* (expand(net.layers{L + 1}.Delta{J}, [net.layers{L + 1}.iSample net.layers{L + 1}.iSample 1]) / net.layers{L + 1}.iSample ^ 2);
             % ÓëÉÏÊ½Ïà±È, ÕâÀïÎÒÈÏÎª×îºÃ²»³ıÒÔnet.layers{L + 1}.iSample ^ 2, ÒòÎªÔÚCNNÕıÏò¼ÆËãº¯ÊıcnnffÖĞÖ»×öÁËÏÂ²ÉÑù´¦Àí, ¿ÉÒÔÈÏÎªÁéÃô¶È(²Ğ²î)ÊÇÖ±½Ó¸´ÖÆ¹ıÈ¥µÄ.
             
@@ -97,6 +98,7 @@ for L = (n - 1) : -1 : tmp
                 
             end
             net.layers{L}.Delta{I} = z;
+            % ×¢Òâ£¬ÕâÀï¿ÉÄÜÊÇÊäÈë²ãi£¬Ò²¿ÉÄÜÊÇ½µ²ÉÑù²ãs£¬ÈôÎªÏÂ²ÉÑù²ãs£¬ÔòÆäDelta±¾Ó¦³ËÉÏ³ËĞÔÆ«ÖÃBeta£¬µ«ÊÇ²¢Ã»ÓĞ³Ë£¬ËùÒÔÒªÖªµÀS²ãµÄDeltaÊÇÈ±ÉÙ³ËĞÔÆ«ÖÃBetaµÄ£¬ÓÃµ½S²ãµÄDeltaÊ±²¹ÉÏ¼´¿É¡£
             %ÏÂ²ÉÑù£¬Ã»ÓĞsigmodµÄ·ÇÏßĞÔ¹ØÏµ£¬ËùÒÔ²»ĞèÒª
 %             net.layers{L}.Delta{I} = dy(net.layers{L}.X{I}) .* net.layers{L}.Delta{I};
             
@@ -130,6 +132,8 @@ for L = 2 : n                                                       % ¶ÔCNNÍøÂç²
                 
                 net.layers{L}.Ker_grad{I}{J} = convn(rot180(net.layers{L - 1}.X{I},3), net.layers{L}.Delta{J}, 'valid') / size(net.layers{L}.Delta{J}, 3);
                 
+                size( net.layers{L}.Ker_grad{I}{J})
+                
             end
             
             % ¶ÔËùÓĞnet.layers{L}.Delta{J}µÄµş¼Ó,½á¹ûÒª¶ÔÑù±¾Êı×öÆ½¾ù
@@ -147,9 +151,10 @@ for L = 2 : n                                                       % ¶ÔCNNÍøÂç²
         for J = 1 : net.layers{L}.iChannel                          % ¶Ô±¾²ãÊä³öÍ¨µÀÊı×öÑ­»·
             
             net.layers{L}.Beta_grad{J} = sum(net.layers{L}.Delta{J}(:) .* net.layers{L}.X_down{J}(:)) / size(net.layers{L}.Delta{J}, 3);            
-            
+
             % ¶ÔËùÓĞnet.layers{L}.Delta{J}µÄµş¼Ó,½á¹ûÒª¶ÔÑù±¾Êı×öÆ½¾ù
-            net.layers{L}.B_grad{J} = sum(net.layers{L}.Delta{J}(:)) / size(net.layers{L}.Delta{J}, 3);            
+            net.layers{L}.B_grad{J} = sum(net.layers{L}.Delta{J}(:)) / size(net.layers{L}.Delta{J}, 3);
+
         end
         
     end
@@ -174,7 +179,7 @@ for L = 2 : n                                                       % ¶ÔCNNÍøÂç²
         
             % È¨Öµ¾ØÕóÌİ¶È,½á¹ûÒª¶ÔÑù±¾Êı×öÆ½¾ù
             net.layers{L}.W_grad = net.layers{L}.Delta * (net.layers{L-1}.X)' / size(net.layers{L}.Delta, 2);
-
+            
             % Êä³ö²ãÁéÃô¶È(²Ğ²î)¾ÍÊÇÆ«ÖÃ(¼ÓĞÔ)µÄÌİ¶È,ÕâÀïÒ²Òª¶ÔÑù±¾Êı×öÆ½¾ù              
             net.layers{L}.B_grad = mean(net.layers{L}.Delta, 2);
         

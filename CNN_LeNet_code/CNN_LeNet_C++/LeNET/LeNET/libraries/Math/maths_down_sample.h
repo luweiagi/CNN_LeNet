@@ -24,3 +24,7 @@ Array3Dd down_sample_max_pooling(const Array3Dd &vector_array, const int sample_
 
 Array3Dd down_sample_stochastic_pooling(const Array3Dd &vector_array, const int sample_num);
 
+Array3Dd up_sample(const Array3Dd &vector_array3D, const int sample_num, down_sample_type sample_type);
+
+Array3Dd up_sample_mean_pooling(const Array3Dd &vector_array3D, const int sample_num);
+

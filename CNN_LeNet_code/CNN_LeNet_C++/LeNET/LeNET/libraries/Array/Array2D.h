@@ -19,6 +19,8 @@ public:
 
 	Array2D(int col, int row, T value);
 
+	Array2D(const vector<vector<T>> &vec_vec);
+
 	// from image 64FC1
 	Array2D(const Mat &img);
 
@@ -95,7 +97,7 @@ public:
 	Array2D<T> transpose() const;
 
 	// 用于卷积核的翻转
-	void flip_xy();
+	Array2D<T> Array2D<T>::flip_xy() const;
 
 	void class_0_to_9(int length);
 
@@ -120,6 +122,8 @@ public:
 	Array2D<T> product(const Array2D<T> &array2D) const;
 
 	T sum() const;
+
+	vector<T> mean() const;
 
 	Array2D<T> pow(const int power_num) const;
 
