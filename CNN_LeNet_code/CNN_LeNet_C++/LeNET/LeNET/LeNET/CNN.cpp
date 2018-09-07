@@ -78,16 +78,19 @@ void CNN::train(const Array3Dd &train_x, const Array2Dd &train_y)
 			clock_t tic_ff = clock();
 			feed_forward(batch_train_x);
 			clock_t toc_ff = clock();
-			cout << "                          batches " << L+1 << " feedforward time has elapsed: " << (double)(toc_ff - tic_ff) / 1000 << " seconds" << endl;
+			cout << "                          batches " << L+1 << " feedforward time: " << (double)(toc_ff - tic_ff) / 1000 << " seconds" << endl;
 		
 			// 得到上面的网络输出后，通过对应的样本标签用bp算法来得到误差对网络权值(反向传播) 的导数
 			clock_t tic_bp = clock();
 			back_propagation(batch_train_y);
 			clock_t toc_bp = clock();
-			cout << "                          batches " << L + 1 << " back propagation time has elapsed: " << (double)(toc_bp - tic_bp) / 1000 << " seconds" << endl;
+			cout << "                          batches " << L + 1 << " back propagation time: " << (double)(toc_bp - tic_bp) / 1000 << " seconds" << endl;
 
 			// 得到误差对权值的导数后，就通过权值更新方法去更新权值
+			clock_t tic_update = clock();
 			update();
+			clock_t toc_update = clock();
+			cout << "                          batches " << L + 1 << " grade update time: " << (double)(toc_update - tic_update) / 1000 << " seconds" << endl;
 
 			mse += _err;
 		}
@@ -109,7 +112,19 @@ void CNN::train(const Array3Dd &train_x, const Array2Dd &train_y)
 double CNN::test(const Array3Dd &test_x, const Array2Dd &test_y)
 {
 	cout << "begin to test" << endl;
-	return 0;
+
+	feed_forward(test_x);
+
+	// 得到预测值
+	vector<int> h = _Y.max_index();
+
+	vector<int> a = test_y.max_index();
+
+	vector<int> bad = find(h - a);
+
+	double er = (double)bad.size() / (double)test_y.size();
+
+	return er;
 }
 
 
@@ -551,6 +566,8 @@ void CNN::back_propagation(const Array2Dd &train_y)
 
 		if (_layers.at(L).type == 'c')
 		{
+			_layers.at(L).B_grad.resize(_layers.at(L).iChannel);
+
 			// 对本层输出通道数做循环
 			for (int J = 0; J < _layers.at(L).iChannel; J++)
 			{
@@ -561,9 +578,12 @@ void CNN::back_propagation(const Array2Dd &train_y)
 					// (1)等价关系 rot180(conv2(a, rot180(b), 'valid')) = conv2(rot180(a), b, 'valid')
 					// (2)若ndims(a) = ndims(b) = 3, 则convn(filpall(a), b, 'valid')表示三个维度上同时相关运算
 					// (3)若size(a, 3) = size(b, 3), 则上式输出第三维为1, 表示参与训练样本的叠加和(批处理算法), 结果要对样本数做平均
-				
-					//_layers.at(L).Ker_grad.at(I).at(J) = convolution(_layers.at(L - 1).X.at(I),3), net.layers{L}.Delta{J}, 'valid') / size(net.layers{L}.Delta{J}, 3);
+
+					_layers.at(L).Ker_grad.at(I).at(J) = convolution(_layers.at(L - 1).X.at(I).flip_xy(), _layers.at(L).Delta.at(J), "valid") * (1.0 / (double)_layers.at(L).Delta.at(J).size());
 				}
+
+				// 对所有net.layers{ L }.Delta{ J }的叠加, 结果要对样本数做平均
+				_layers.at(L).B_grad.at(J) =_layers.at(L).Delta.at(J).sum() / (double)_layers.at(L).Delta.at(J).size();
 			}
 		}
 
@@ -608,5 +628,60 @@ void CNN::back_propagation(const Array2Dd &train_y)
 // CNN网络,卷积层和输出层的权值更新(附加惯性项)
 void CNN::update(void)
 {
-	;
+	// CNN网络层数
+	int n = _layers.size();
+
+	// 对权值和偏置的更新采用动量法（对梯度下降法的改进，防止反复震荡），参考文献：https://blog.csdn.net/qq_37053885/article/details/81605365
+	
+	for (int L = 1; L < n; L++)
+	{
+		// ======================================================================
+		// 以下代码用于卷积层的计算
+		if (_layers.at(L).type == 'c')
+		{
+			// 对本层输出通道数做循环
+			for (int J = 0; J < _layers.at(L).iChannel; J++)
+			{
+				// 对上一层输出通道数做循环
+				for (int I = 0; I < _layers.at(L - 1).iChannel; I++)
+				{
+					// 这里没什么好说的，就是普通的权值更新的公式：W_new = W_old - alpha * de / dW（误差对权值导数）
+					// net.layers{ L }.Ker_delta{ I }{J} = net.eta * net.layers{ L }.Ker_delta{ I }{J} -net.alpha * net.layers{ L }.Ker_grad{ I }{J};
+					// net.layers{ L }.Ker{ I }{J} = net.layers{ L }.Ker{ I }{J} +net.layers{ L }.Ker_delta{ I }{J};
+					_layers.at(L).Ker_delta.at(I).at(J) = _layers.at(L).Ker_delta.at(I).at(J) * _eta - _layers.at(L).Ker_grad.at(I).at(J) * _alpha;
+					_layers.at(L).Ker.at(I).at(J) = _layers.at(L).Ker.at(I).at(J) + _layers.at(L).Ker_delta.at(I).at(J);
+				}
+			}
+
+			// 本层一个通道输出对应一个加性偏置net.layers{ L }.B{ J }
+			_layers.at(L).B_delta = _layers.at(L).B_delta * _eta - _layers.at(L).B_grad * _alpha;
+			_layers.at(L).B = _layers.at(L).B + _layers.at(L).B_delta;
+		}
+
+		// ======================================================================
+		// 以下代码用于下采样层的计算
+		if (_layers.at(L).type == 's')
+		{
+			// 本层一个通道输出对应一个加性偏置net.layers{ L }.B{ J }
+			_layers.at(L).B_delta = _layers.at(L).B_delta * _eta - _layers.at(L).B_grad * _alpha;
+			_layers.at(L).B = _layers.at(L).B + _layers.at(L).B_delta;
+
+			// 本层一个通道输出对应一个乘性偏置net.layers{ L }.Beta{ J }
+			_layers.at(L).Beta_delta = _layers.at(L).Beta_delta * _eta - _layers.at(L).Beta_grad * _alpha;
+			_layers.at(L).Beta = _layers.at(L).Beta + _layers.at(L).Beta_delta;
+		}
+
+		// ======================================================================
+		// 以下代码用于全连接层的计算
+		if (_layers.at(L).type == 'f')
+		{
+			// 本层一个通道输出对应一个加权系数net.layers{ L }.W
+			_layers.at(L).W_delta = _layers.at(L).W_delta * _eta -  _layers.at(L).W_grad * _alpha;
+			_layers.at(L).W = _layers.at(L).W + _layers.at(L).W_delta;
+
+			// 本层一个通道输出对应一个加性偏置net.layers{ L }.B{ J }
+			_layers.at(L).B_delta = _layers.at(L).B_delta * _eta - _layers.at(L).B_grad * _alpha;
+			_layers.at(L).B = _layers.at(L).B + _layers.at(L).B_delta;
+		}
+	}
 }

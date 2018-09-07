@@ -511,6 +511,12 @@ template <typename T>
 Array2D<T> Array2D<T>::operator + (const Array2D<T> &array2D) const
 {
 	int col_A = _array2D.size();
+
+	if (col_A <= 0)
+	{
+		return array2D;
+	}
+
 	int row_A = _array2D.at(0).size();
 	int col_B = array2D.size();
 	int row_B = array2D.at(0).size();
@@ -653,6 +659,13 @@ template <typename T>
 void Array2D<T>::add(const Array2D<T> &array2D)
 {
 	int col_A = _array2D.size();
+
+	if (col_A <= 0)
+	{
+		_array2D = array2D.get_array2D();
+		return;
+	}
+
 	int row_A = _array2D.at(0).size();
 	int col_B = array2D.size();
 	int row_B = array2D.at(0).size();
@@ -944,9 +957,46 @@ Mat Array2D<T>::to_Mat_64FC1() const
 }
 
 
+template <typename T>
+vector<vector<T>> Array2D<T>::get_array2D() const
+{
+	return _array2D;
+}
 
 
+template <typename T>
+vector<int> Array2D<T>::max_index() const
+{
+	int col = _array2D.size();
+	if (col <= 0)
+	{
+		cout << "Array2D is empty!" << endl << "Array2D.max_index() failed" << endl;
+		vector<int> temp;
+		return temp;
+	}
 
+	int row = _array2D.at(0).size();
+
+	vector<int> vec_index;
+	T max_val = INT_MIN;
+	int index = 0;
+	for (int i = 0; i < col; ++i)
+	{
+		for (int j = 0; j < row; ++j)
+		{
+			T val_ij = _array2D.at(i).at(j);
+			if (max_val < val_ij)
+			{
+				max_val = val_ij;
+				index = j;
+			}
+		}
+		vec_index.push_back(index);
+		max_val = INT_MIN;
+	}
+
+	return vec_index;
+}
 
 
 // only define for double
@@ -989,6 +1039,5 @@ template void Array2D<double>::print() const;
 template void Array2D<double>::show_image_64FC1() const;
 template void Array2D<double>::show_image_64FC1(int time_msec) const;
 template Mat Array2D<double>::to_Mat_64FC1() const;
-
-
-
+template vector<vector<double>> Array2D<double>::get_array2D() const;
+template vector<int> Array2D<double>::max_index() const;

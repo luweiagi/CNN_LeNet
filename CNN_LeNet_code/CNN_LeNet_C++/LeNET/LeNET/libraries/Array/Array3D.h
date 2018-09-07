@@ -92,6 +92,8 @@ public:
 		return vec_arr3D;
 	}
 
+	Array3D<T> Array3D<T>::flip_xy() const;
+
 	// ************************** 数学运算 **************************************** //
 
 	Array3D<T> operator + (const Array3D<T> &array3D) const;
@@ -105,6 +107,8 @@ public:
 	void add(const Array3D<T> &array3D);
 
 	void dot_product(const Array3D<T> &array3D);
+
+	T sum() const;
 
 	// *************************** 输出 ***************************************** //
 

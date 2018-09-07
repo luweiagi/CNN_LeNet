@@ -100,6 +100,43 @@ Array3Dd convolution(Array3Dd X, const Array2Dd &Ker, string shape)
 }
 
 
+// 若size(a, 3) = size(b, 3), 则上式输出第三维为1, 表示参与训练样本的叠加和(批处理算法), 结果要对样本数做平均
+// 就是对每一幅图像做卷积，然后加起来
+Array2Dd convolution(const Array3Dd &X, const Array3Dd &Ker, string shape)
+{
+	// 'full' - (default) returns the full N - D convolution
+	// 'valid' - returns only the part of the result that can be
+	//          computed without assuming zero - padded arrays.
+	//          size(C, k) = max([nak - max(0, nbk - 1)], 0).
+
+	if (shape != "valid" && shape != "full")
+	{
+		cout << "wrong convolution shape control!" << endl << "convolution() failed!" << endl;
+		Array2Dd temp;
+		return temp;
+	}
+
+	int page_X = X.size();
+	int page_Ker = Ker.size();
+
+	if (page_X != page_Ker)
+	{
+		cout << "page size not equal!" << endl << "convolution() failed!" << endl;
+		Array2Dd temp;
+		return temp;
+	}
+
+	Array2Dd sum;
+
+	for (int i = 0; i < page_X; ++i)
+	{
+		sum.add(convolution(X.at(i), Ker.at(i), shape));
+	}
+
+	return sum;
+}
+
+
 // 采用数组来求卷积，而不是用vector，速度要快30倍！
 Array2Dd convolution(Array2Dd X, Array2Dd Ker, string shape)
 {

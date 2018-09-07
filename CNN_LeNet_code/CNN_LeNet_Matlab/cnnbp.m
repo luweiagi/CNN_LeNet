@@ -132,8 +132,6 @@ for L = 2 : n                                                       % ¶ÔCNNÍøÂç²
                 
                 net.layers{L}.Ker_grad{I}{J} = convn(rot180(net.layers{L - 1}.X{I},3), net.layers{L}.Delta{J}, 'valid') / size(net.layers{L}.Delta{J}, 3);
                 
-                size( net.layers{L}.Ker_grad{I}{J})
-                
             end
             
             % ¶ÔËùÓĞnet.layers{L}.Delta{J}µÄµş¼Ó,½á¹ûÒª¶ÔÑù±¾Êı×öÆ½¾ù

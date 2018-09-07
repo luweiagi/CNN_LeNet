@@ -4,20 +4,12 @@
 #include <maths.h>
 #include <CNN.h>
 #include <string>
+#include <time.h>
 
 
 void test()
 {
-	Array3Dd a(2, 3, 2, 1);
-	a.at(0).at(0).at(0) = 5;
-	a.at(1).at(0).at(0) = 6;
-	a.at(1).at(0).at(1) = 3;
-	a.at(1).at(1).at(0) = 2;
-	vector<double> b = a.reshape_to_vector();
-	print(b);
-
-	double ddd = sum_vector(b);
-	cout << ddd << endl;
+	;
 }
 
 
@@ -28,6 +20,8 @@ int main()
 	//*
 
 	// ****************************** 创建训练集 ***************************************************** //
+
+	clock_t tic_LeNet = clock();// LeNet运行计时
 
 	// 加载训练集的样本图片
 	vector<Mat> train_x_Mat;
@@ -96,8 +90,8 @@ int main()
 	layers.push_back(fully_connected_layer_8);
 
 	// 定义初始化参数
-	float alpha = 2;// 学习率[0.1,3]
-	float eta = 0.5f;// 惯性系数[0,0.95], >=1不收敛，==0为不用惯性项
+	double alpha = 2;// 学习率[0.1,3]
+	double eta = 0.5f;// 惯性系数[0,0.95], >=1不收敛，==0为不用惯性项
 	int batchsize = 10;// 每次用batchsize个样本计算一个delta调整一次权值，每十个样本做平均进行调节
 	int epochs = 25;// 训练集整体迭代次数
 	activation_function_type activ_func_type = SoftMax;// 激活函数类型
@@ -119,28 +113,15 @@ int main()
 	// 测试结果输出
 	cout << "error rate is ： " << error_rate * 100 << "%" << endl;
 
-	// 绘制出均方误差历史曲线
-	show_curve_image(get_vector_n2m(0, LeNet.get_epochs()-1), LeNet.get_ERR(), 25, 1000);
+	cout << "error history is ： " << endl;
+	print(LeNet.get_ERR());
 
+	// 绘制出均方误差历史曲线
+	show_curve_image(get_vector_n2m(0, LeNet.get_epochs()-1), LeNet.get_ERR() * 50.0, 25, 30000);
+
+	clock_t toc_LeNet = clock();// LeNet运行计时
+
+	cout << "LeNet total time: " << (double)(toc_LeNet - tic_LeNet) / 1000 << " seconds" << endl;
 	//*/
 	return 0;
 }
-
-
-
-/*
-Mat train_x1 = imread("file/2.bmp",0);//读取灰度图
-// normalize 归一化， 由0~255的uchar类型变为0~1的double类型
-train_x1.convertTo(train_x1, CV_64FC1, 1 / 255.0);//其中dst为目标图， CV_32FC3为要转化的类型
-// 显示图片
-imshow("图片", train_x1);
-// 等待1000ms后窗口自动关闭
-waitKey(2000);
-// 把图片以矩阵的形式显示出来，用于查看图片每一像素的值。
-show_image_64FC1_as_matrix_double(train_x1);
-
-double train_y[10][1000] = { 0 };
-set_target_class_one2ten(train_y);
-// 以图片的形式把矩阵显示出来
-show_matrix_double_as_image_64FC1(train_y[0], 10, 1000, 6000);
-*/

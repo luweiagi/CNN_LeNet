@@ -271,10 +271,32 @@ Array2D<T> Array3D<T>::reshape_to_Array2D() const
 
 
 template <typename T>
-Array3D<T> Array3D<T>::operator + (const Array3D<T> &array3D) const
+Array3D<T> Array3D<T>::flip_xy() const
 {
 	int page = _array3D.size();
 
+	if (page <= 0)
+	{
+		cout << "Array3D is empty!" << endl << "Array3D.flip_xy() failed!" << endl;
+		Array3D<T> temp;
+		return temp;
+	}
+
+	Array3D<T> array3D;
+
+	for (int i = 0; i < page; ++i)
+	{
+		array3D.push_back(_array3D.at(i).flip_xy());
+	}
+	return array3D;
+}
+
+
+template <typename T>
+Array3D<T> Array3D<T>::operator + (const Array3D<T> &array3D) const
+{
+	int page = _array3D.size();
+	// 别乱改，这里是正确的，防止第一次相加时page=0时，也能成立。
 	if (page <= 0)
 	{
 		return array3D;
@@ -436,6 +458,37 @@ void Array3D<T>::dot_product(const Array3D<T> &array3D)
 
 
 template <typename T>
+T Array3D<T>::sum() const
+{
+	int page = _array3D.size();
+
+	if (page <= 0)
+	{
+		cout << "Array3D is empty!" << endl << "Array3D.sum() failed!" << endl;
+		return 0;
+	}
+
+	int col = _array3D.at(0).size();
+	int row = _array3D.at(0).at(0).size();
+
+	T sum_ret = 0;
+
+	for (int i = 0; i < page; i++)
+	{
+		for (int j = 0; j < col; j++)
+		{
+			for (int k = 0; k < row; k++)
+			{
+				sum_ret += _array3D.at(i).at(j).at(k);
+			}
+		}
+	}
+
+	return sum_ret;
+}
+
+
+template <typename T>
 int Array3D<T>::size() const
 {
 	return _array3D.size();
@@ -504,12 +557,14 @@ template Array3D<double> Array3D<double>::sampling(const int &sample_interval) c
 template void Array3D<double>::expand_to_full_size(int col_size, int row_size);
 template vector<double> Array3D<double>::reshape_to_vector() const;
 template Array2D<double> Array3D<double>::reshape_to_Array2D() const;
+template Array3D<double> Array3D<double>::flip_xy() const;
 template Array3D<double> Array3D<double>::operator + (const Array3D<double> &array3D) const;
 template Array3D<double> Array3D<double>::operator + (const double &val) const;
 template Array3D<double> Array3D<double>::operator * (const Array3D<double> &array3D) const;
 template Array3D<double> Array3D<double>::operator * (const double &val) const;
 template void Array3D<double>::add(const Array3D<double> &array3D);
 template void Array3D<double>::dot_product(const Array3D<double> &array3D);
+template double Array3D<double>::sum() const;
 template int Array3D<double>::size() const;
 template void Array3D<double>::print() const;
 template void Array3D<double>::show_specified_images_64FC1(const std::string& MultiShow_WinName, CvSize SubPlot, CvSize ImgMax_Size, int time_msec) const;

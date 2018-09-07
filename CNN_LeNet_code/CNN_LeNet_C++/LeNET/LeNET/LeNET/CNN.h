@@ -60,7 +60,7 @@ typedef struct{
 	// 当前层输出通道的加性偏置
 	vector<double> B;
 
-	// ？？？
+	// 当前层输出通道的加性偏置的更新量
 	vector<double> B_delta;
 
 	// 当前层输出通道的加性偏置的梯度
@@ -69,7 +69,7 @@ typedef struct{
 	// 当前层输出通道的乘性偏置
 	vector<double> Beta;// 只针对下采样层，其它层此参数无意义
 
-	// ？？？
+	// 当前层输出通道的乘性偏置的更新量
 	vector<double> Beta_delta;// 只针对下采样层，其它层此参数无意义
 
 	// 当前层输出通道的乘性偏置的梯度
@@ -133,10 +133,10 @@ private:
 	vector<Layer> _layers;
 
 	// 学习率[0.1,3]
-	float _alpha;
+	double _alpha;
 
 	// 惯性系数[0,0.95], >=1不收敛，==0为不用惯性项
-	float _eta;
+	double _eta;
 
 	// 每次用batchsize个样本计算一个delta调整一次权值，每十个样本做平均进行调节
 	int _batchsize;
